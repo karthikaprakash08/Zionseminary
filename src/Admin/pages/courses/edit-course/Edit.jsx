@@ -93,8 +93,8 @@ const Edit = ({ courseDetails }) => {
     ) {
       try {
         console.log(courseDetails)
-        const res = await updateDegree(courseData,courseDetails.id);
-        if(res) navigate("/admin");
+        const res = await updateDegree(courseData, courseDetails.id);
+        if (res) navigate("/admin");
       } catch (error) {
         console.log(error);
       }
@@ -249,68 +249,6 @@ const Edit = ({ courseDetails }) => {
                 placeholder=""
               />
             </div>
-          </div>
-          <div className="course-description-cnt">
-            <p>OverviewPoints</p>
-            {editCourse && (
-              <div className="overview-input-cnt">
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  className="name-input"
-                  readOnly={editCourse ? false : true}
-                  value={currentOverview.heading}
-                  placeholder="Heading"
-                  onChange={(e) =>
-                    handleOverviewInput("heading", e.target.value)
-                  }
-                />
-                <textarea
-                  type="text"
-                  name=""
-                  id=""
-                  className=" overview-input name-input"
-                  placeholder="Description"
-                  readOnly={editCourse ? false : true}
-                  value={currentOverview.content}
-                  onChange={(e) =>
-                    handleOverviewInput("content", e.target.value)
-                  }
-                />
-                <div
-                  className="overview-add-btn"
-                  onClick={() => addNewOverview()}
-                >
-                  <p>Add</p>
-                </div>
-              </div>
-            )}
-            {courseData?.overviewPoints?.map((overview, index) => (
-              <div className="overviewPoint-cnt" key={index}>
-                <div className="overview-head-cnt">
-                  <p className="overviewPoint-heading">{overview?.heading}</p>
-                  {editCourse && (
-                    <div className="action-btn-cnt-overview">
-                      <img
-                        src={Trash}
-                        alt="delete"
-                        className="action-img-overview"
-                        onClick={() => handleRemoveOverview(index)}
-                      />
-                      <img
-                        src={EditImg}
-                        alt="edit"
-                        className="action-img-overview"
-                        onClick={() => setEditValues(overview, index)}
-                      // onClick={() => openEdit()}
-                      />
-                    </div>
-                  )}
-                </div>
-                <p className="overviewPoint-content">{overview?.content}</p>
-              </div>
-            ))}
           </div>
         </form>
         <form className="form-right">
