@@ -36,7 +36,7 @@ const CourseList = () => {
   return (
     <div className="course-list-cnt">
       <div className="course-list-header">
-        <h2>All Courses</h2>
+        <h2 className="h2-user-title">All Courses</h2>
         <div className="admin-add-course-btn" onClick={() => navigate("Courses/new")}>
           <h3 className="top-btn-text">Add Course</h3>
         </div>

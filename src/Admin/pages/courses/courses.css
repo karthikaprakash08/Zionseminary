@@ -78,7 +78,7 @@ input[type="file"] {
 
 .course-card {
   width: 10rem;
-  height: 20rem;
+  height: 12rem;
   background: #ffffff;
   border-radius: 0.5rem;
   padding: 0.5rem;
@@ -114,7 +114,7 @@ input[type="file"] {
   justify-content: center;
   align-items: center;
   border-radius: 0.3rem;
-  background: #8949ff;
+  background: #2a99e3;
   color: white;
   cursor: pointer;
 }
@@ -1000,6 +1000,10 @@ input[type="file"]::file-selector-button:active {
 
   .top-btn-cnt {
     gap: 2rem;
+  }
+
+  .course-card{
+    height: 20rem;
   }
 
   .course-name-cnt {
