@@ -63,14 +63,6 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
   const addSublessons = async () => {
     const newLessons = [...currentLesson.features];
     if (currentSublesson) {
-      // let Link;
-      // if (currentSublesson.type === "video") Link = await getVideoURL();
-      // if (
-      //   currentSublesson.type === "pdf" ||
-      //   currentSublesson.type === "ppt" ||
-      //   currentSublesson.type === "doc"
-      // )
-      //   Link = await getDocumentUrl();
       if (
         currentUpdateIndex === null ||
         currentUpdateIndex === undefined
@@ -78,33 +70,13 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
         newLessons.push(currentSublesson);
         setCurrentLesson({ ...currentLesson, features: newLessons });
         setCurrentSublesson("")
-        // setCurrentSublesson({
-        //   title: "",
-        //   duration: "",
-        //   link: "#",
-        //   updateIndex: null,
-        //   type: null,
-        // });
       } else {
-        // newLessons[currentSublesson.updateIndex] = {
-        //   ...currentSublesson,
-        //   link: Link,
-        // };
+        newLessons[currentUpdateIndex] = currentSublesson;
         setCurrentLesson({ ...currentLesson, features: newLessons });
         setCurrentSublesson('')
-        // setCurrentSublesson({
-        //   title: "",
-        //   duration: "",
-        //   link: "#",
-        //   updateIndex: null,
-        //   type: null,
-        // });
       }
     } else if (
       currentSublesson
-      // currentSublesson.link !== "#" &&
-      // currentSublesson.title &&
-      // currentSublesson.duration
     ) {
       newLessons[currentSublesson.updateIndex] = currentSublesson;
       setCurrentLesson({ ...currentLesson, features: newLessons });
@@ -134,7 +106,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
     setCurrentLesson({ ...currentLesson, features: newsubLessons });
   };
 
-  console.log(currentLesson);
+  console.log(currentLesson, currentUpdateIndex);
 
   useEffect(() => {
     if (editData) setCurrentLesson(editData);
@@ -180,7 +152,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
         </h3>
         <div className="new-lesson-top">
           <div className="lesson-name-cnt">
-            <p>Course Title</p>
+            <p >Course Title</p>
             <input
               type="text"
               name=""
@@ -208,38 +180,11 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
               />
             </div>
             <div className="sublesson-content-cover">
-              <div className="input-cnt">
-                <p>Duration</p>
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  className="sublesson-duration-input sublesson-title-input "
-                  value={currentSublesson.duration}
-                  onChange={(e) =>
-                    handleSubLessonsInput("duration", e.target.value)
-                  }
-                />
-              </div>
-              <div className="input-cnt add-sublesson-btn">
-                <div className="sublesson-title-input center-media">
-                  <p>upload video</p>
-                  <input
-                    type="file"
-                    name="video-upload"
-                    accept="video/*,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation"
-                    style={{ position: "absolute" }}
-                    id=""
-                    className="file-title-input"
-                    onChange={(e) => handleAddFile(e.target.files[0])}
-                  />
-                </div>
-              </div>
               <div
                 className="add-new-lesson-btn add-sublesson-btn"
                 onClick={() => addSublessons()}
               >
-                {currentUpdateIndex ? "Update" : "Add"}
+                {currentUpdateIndex !== null ? "Update" : "Add"}
               </div>
             </div>
           </div>
@@ -255,7 +200,30 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
               }}
             >
               <div className="sublesson-name-cnt">
-                <p className="sublesson-title-txt">Sub lesson Title</p>
+                <div className="sublesson-content-cover">
+
+                  <p className="sublesson-title-txt">Sub lesson Title</p>
+                  <div
+                    className="add-new-lesson-btn add-sublesson-btn edit-sublesson-btn"
+                  >
+                    <div className="delete-btn">
+                      <img
+                        src={Trash}
+                        alt="delete"
+                        className="action-btn-img"
+                        onClick={() => handleRemoveSublesson(index)}
+                      />
+                    </div>
+                    <div className="delete-btn">
+                      <img
+                        src={Edit}
+                        alt="edit"
+                        className="action-btn-img"
+                        onClick={() => setEditSublesson(sublesson, index)}
+                      />
+                    </div>
+                  </div>
+                </div>
                 <input
                   type="text"
                   name=""
@@ -264,47 +232,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
                   className="sublesson-title-input sublesson-card-input"
                 />
               </div>
-              <div className="sublesson-content-cover">
-                <div className="input-cnt sublesson-title-txt">
-                  <p>Duration</p>
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    value={sublesson?.duration}
-                    className="sublesson-duration-input sublesson-title-input sublesson-card-input"
-                  />
-                </div>
-                <div className="input-cnt add-sublesson-btn">
-                  <div
-                    className="sublesson-title-input center-media sublesson-card-input"
-                    onClick={() => window.open(sublesson?.link)}
-                  >
-                    <p className="sublesson-title-txt">{`open ${sublesson.type}`}</p>
-                  </div>
-                </div>
-                <div
-                  className="add-new-lesson-btn add-sublesson-btn edit-sublesson-btn"
-                //   onClick={() => setPopupOpen(false)}
-                >
-                  <div className="delete-btn">
-                    <img
-                      src={Trash}
-                      alt="delete"
-                      className="action-btn-img"
-                      onClick={() => handleRemoveSublesson(index)}
-                    />
-                  </div>
-                  <div className="delete-btn">
-                    <img
-                      src={Edit}
-                      alt="edit"
-                      className="action-btn-img"
-                      onClick={() => setEditSublesson(sublesson, index)}
-                    />
-                  </div>
-                </div>
-              </div>
+
             </div>
           ))}
         </div>
