@@ -1,10 +1,10 @@
-import { addDoc, collection, getDocs, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "./firebase";
 
 export const addUser = async (data) => {
     try {
-        const signatureFile = data.signature[0];
+        const signatureFile = data.signatureURL[0];
         const signatureRef = ref(storage, `signatures/${signatureFile.name}`);
         await uploadBytes(signatureRef, signatureFile);
         const signatureURL = await getDownloadURL(signatureRef);
@@ -63,26 +63,28 @@ export const editUser = async (data) => {
         let educationCertURL = data?.educationCertURL || '';
         let signatureURL = data?.signatureURL || '';
         let passportPhotoURL = data?.passportPhotoURL || '';
-
-        const signatureFile = data?.signature[0];
-        if (signatureFile) {
+        console.log(data?.signatureURL[0])
+        if (data?.signatureURL[0]) {
+            const signatureFile = data?.signatureURL[0];
             const signatureRef = ref(storage, `signatures/${signatureFile?.name}`);
             await uploadBytes(signatureRef, signatureFile);
             signatureURL = await getDownloadURL(signatureRef);
+            console.log(signatureURL)
         }
-        const passportPhotoFile = data.passportSizePhoto[0];
-        if (passportPhotoFile) {
+        if (data?.passportPhotoURL[0]) {
+            const passportPhotoFile = data?.passportPhotoURL[0];
             const passportPhotoRef = ref(storage, `photos/${passportPhotoFile.name}`);
             await uploadBytes(passportPhotoRef, passportPhotoFile);
             passportPhotoURL = await getDownloadURL(passportPhotoRef);
         }
-        const educationCertFile = data.educationCertificate[0];
-        if (educationCertFile) {
+        if (data?.educationCertURL[0]) {
+            const educationCertFile = data?.educationCertURL[0];
             const educationCertRef = ref(storage, `certificates/${educationCertFile.name}`);
             await uploadBytes(educationCertRef, educationCertFile);
             educationCertURL = await getDownloadURL(educationCertRef);
         }
-        await updateDoc(collection(db, 'users'), {
+        const docRef = doc(db, 'users', data?.id)
+        await setDoc(docRef, {
             firstName: data.firstName,
             lastName: data.lastName,
             mobileNo: data.mobileNo,
@@ -105,5 +107,17 @@ export const editUser = async (data) => {
         return true
     } catch (error) {
         console.error('Error saving data or uploading files:', error);
+    }
+}
+
+export const deleteUser = async (id) => {
+    try {
+        if (!id) {
+            throw new Error('Invalid document ID');
+        }
+        await deleteDoc(doc(db, 'users', id));
+        return true;
+    } catch (error) {
+        console.log('Error deleting user:', error);
     }
 }
