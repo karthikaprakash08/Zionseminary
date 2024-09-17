@@ -35,7 +35,7 @@ const Chart = ({ data }) => {
               label
             >
               <Cell key="completed" fill="#82ca9d" />
-              <Cell key="inProgress" fill="#8884d8" />
+              <Cell key="inProgress" fill="#00AAFF" />
               <Cell key="notStarted" fill="#FFBB28" />
             </Pie>
             <Tooltip />
@@ -55,7 +55,7 @@ const Chart = ({ data }) => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="value" fill="#8949FF" />
+            <Bar dataKey="value" fill="#00AAFF" />
           </BarChart>
         </ResponsiveContainer>
       )}

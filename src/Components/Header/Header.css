@@ -5,15 +5,6 @@
   justify-content: space-between;
 }
 
-.welcome-message h1 {
-  margin: 0;
-  color: #fff;
-  font-weight: 500;
-}
-
-.welcome-message p {
-  color: #636e72;
-}
 
 .calendar {
   width: 300px;
@@ -21,7 +12,7 @@
 
 .header {
   flex: 1;
-  background-image: url("../Assets/Images/welcomebg.jpg");
+  background-image: url("../Assets/Images/welcomebg2.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -32,12 +23,12 @@
 
 .welcome-message h1 {
   margin: 0;
-  color: #fff;
+  color: #102e1d;
   font-size: 2rem;
 }
 
 .welcome-message p {
-  color: #000000;
+  color: #d9e0e1;
   width: 65%;
   margin: 16px 0px;
 }

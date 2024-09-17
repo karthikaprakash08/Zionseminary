@@ -149,6 +149,9 @@ function Register() {
         <div className="form-group">
               <input type="submit" className='submit-btn' value="Submit" />
             </div>
+            <div className="form-group" style={{ textAlign: 'center', marginTop: '20px' }}>
+          <p>Already have an account? <a href='/login'>signin</a></p> 
+        </div>
       </form>
     </div>
   );

@@ -33,7 +33,7 @@ function Login() {
         <h2 style={{ textAlign: 'center', marginBottom: "40px" }}>Login</h2>
         <div className="form-group">
           <label>Username</label>
-          <input
+          <input style={{ width: "500px" }}
             type="text"
             placeholder="Enter Username"
             {...register('username', { required: true })}
@@ -41,7 +41,7 @@ function Login() {
         </div>
         <div className="form-group">
           <label>Password</label>
-          <input
+          <input style={{ width: "500px" }}
             type="password"
             placeholder="Enter Password"
             {...register('password', { required: true })}
