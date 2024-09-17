@@ -7,11 +7,10 @@ const Users = ({ openNewUser, openEditUser }) => {
   return (
     <div className="user-page">
       <>
-        <h2 className="users-page-title">User Management</h2>
-        <p>Manage the users and their details here</p>
+        {/* <h2 className="users-page-title">User Management</h2> */}
       </>
       <div className="users-list-header">
-        <h2>
+        <h2 className="h2-user-title">
           All users
           <span> 44</span>
         </h2>

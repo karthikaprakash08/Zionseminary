@@ -70,7 +70,7 @@ const AddnewUser = ({ closeNewUser }) => {
     <div className="add-new-user-cover">
       <div className="add-new-user-cnt">
         <>
-          <h2>New User </h2>
+          <h3>New User </h3>
           <p>Enter New User Details</p>
         </>
         <form className="user-details-from">

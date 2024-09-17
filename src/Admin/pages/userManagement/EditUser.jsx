@@ -2,13 +2,13 @@ import React from "react";
 import potrate from "../../Assets/Images/potrate-1.jpg";
 import Trash from "../../Assets/Images/trash.png";
 import Edit from "../../Assets/Images/edit.png";
-// import { deleteUser } from "../../api/baseApi";
+import { deleteUser } from "../../firebase/userApi";
 
 const EditUser = ({ open, openEdit, data }) => {
-  const deleteAction = async () => {
+  const deleteAction = async (userID) => {
     try {
-      // const res = await deleteUser(data?._id);
-      // console.log(res);
+      const res = await deleteUser(userID);
+      console.log(res);
     } catch (error) {
       console.log(error);
     }
@@ -16,7 +16,7 @@ const EditUser = ({ open, openEdit, data }) => {
   return (
     <div
       className="edit-user-cnt"
-      style={{ right: open?.open ? "1rem" : " -28rem" }}
+      style={{ right: open?.open ? "1rem" : " -28rem", display: open?.open ? "block" : "none" }}
     >
       <div className="profile-details-cnt">
         <img src={data?.passportPhotoURL} alt="potrate" className="profile-details-img" />
@@ -26,7 +26,7 @@ const EditUser = ({ open, openEdit, data }) => {
             src={Trash}
             alt="delete"
             className="action-img"
-            onClick={() => deleteAction()}
+            onClick={() => deleteAction(data?.id)}
           />
           <img
             src={Edit}
