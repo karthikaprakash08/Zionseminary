@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 
 
-=======
->>>>>>> ef54e4f062b2101246ba32e3969e0b1d78157f6d
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from 'firebase/storage';
@@ -28,8 +25,4 @@ const storage = getStorage(app);
 const auth = getAuth(app);
 
 
-<<<<<<< HEAD
 export { db, storage, auth };
-=======
-export { db, storage, auth };
->>>>>>> ef54e4f062b2101246ba32e3969e0b1d78157f6d
