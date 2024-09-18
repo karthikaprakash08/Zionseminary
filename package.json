@@ -13,7 +13,10 @@
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.7.5",
+<<<<<<< HEAD
     "bcrypt": "^5.1.1",
+=======
+>>>>>>> ef54e4f062b2101246ba32e3969e0b1d78157f6d
     "bcryptjs": "^2.4.3",
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",

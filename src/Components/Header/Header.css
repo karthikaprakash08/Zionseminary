@@ -12,7 +12,11 @@
 
 .header {
   flex: 1;
+<<<<<<< HEAD
   background-image: url("../Assets/Images/welcomebg2.jpg");
+=======
+  background-image: url("../Assets/Images/welcomebg4.jpg");
+>>>>>>> ef54e4f062b2101246ba32e3969e0b1d78157f6d
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

@@ -6,7 +6,11 @@
   text-align: center;
   margin-left: auto;
   width: 280px;
+<<<<<<< HEAD
   height: 280px;
+=======
+  height: 315px;
+>>>>>>> ef54e4f062b2101246ba32e3969e0b1d78157f6d
   border-radius: 8px;
 }
 
@@ -51,8 +55,13 @@
     margin-top: 5px;
   }
 
+<<<<<<< HEAD
   .react-calendar__month-view__days button,
   .react-calendar__month-view__weekdays__weekday abbr {
+=======
+  .react-calendar_month-view_days button,
+  .react-calendar_month-viewweekdays_weekday abbr {
+>>>>>>> ef54e4f062b2101246ba32e3969e0b1d78157f6d
     font-size: 12px;
   }
 }
@@ -66,9 +75,18 @@
   .custom-calendar {
     height: 270px;
   }
+<<<<<<< HEAD
   .react-calendar__month-view__days button,
   .react-calendar__month-view__weekdays__weekday abbr {
     font-size: 11px;
     padding: 8px;
   }
 }
+=======
+  .react-calendar_month-view_days button,
+  .react-calendar_month-viewweekdays_weekday abbr {
+    font-size: 11px;
+    padding: 8px;
+  }
+}
+>>>>>>> ef54e4f062b2101246ba32e3969e0b1d78157f6d
