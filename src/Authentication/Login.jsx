@@ -5,27 +5,28 @@ import './Register.css'; // Reuse the same CSS file
 import { getAllUsers } from '../Admin/firebase/userApi';
 
 function Login() {
-  const { register, handleSubmit } = useForm();
-  const navigate = useNavigate();
-  let [userdata, setuserdata] = useState([]);
-
-  // Handle login
-  console.log(userdata)
-  const onSubmit = async (data) => {
-    // Here you would normally handle the login logic, e.g., checking credentials against a database.
-    const res = await getAllUsers();
-    const userdata = [];
-    res.forEach(user => {  
-        if(user.email==data.username){
-            setuserdata(user);
-            localStorage.setItem("userdata", JSON.stringify(user));
-            navigate("/home")
+    const { register, handleSubmit } = useForm();
+    const navigate = useNavigate();
+    const [userdata, setUserdata] = useState(null);
+    const onSubmit = async (data) => {
+      const res = await getAllUsers();
+      
+      let foundUser = null;
+      res.forEach(user => {
+        if (user.email === data.username && user.password === data.password) { // Match both email and password
+          foundUser = user;
         }
-    })
-    // console.log(user)
-    // For now, let's just redirect to a dashboard or another page after login
-    // navigate('/home'); // Adjust the path as needed
-  };
+      });
+  
+      // If user is found, log in
+      if (foundUser) {
+        setUserdata(foundUser);
+        localStorage.setItem("userdata", JSON.stringify(foundUser));
+        navigate("/home");
+      } else {
+        alert('Invalid username or password');
+      }
+    };
 
   return (
     <div style={{height:"100vh"}} className='register'>
@@ -33,7 +34,7 @@ function Login() {
         <h2 style={{ textAlign: 'center', marginBottom: "40px" }}>Login</h2>
         <div className="form-group">
           <label>Username</label>
-          <input style={{ width: "500px" }}
+          <input
             type="text"
             placeholder="Enter Username"
             {...register('username', { required: true })}
@@ -41,7 +42,7 @@ function Login() {
         </div>
         <div className="form-group">
           <label>Password</label>
-          <input style={{ width: "500px" }}
+          <input
             type="password"
             placeholder="Enter Password"
             {...register('password', { required: true })}

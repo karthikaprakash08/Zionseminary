@@ -3,12 +3,12 @@ import './Register.css';
 import { useForm } from 'react-hook-form';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
-import { db, storage } from '../Admin/firebase/firebase';
+import { db, storage, auth } from '../Admin/firebase/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
-import { getAllDegrees } from '../Admin/firebase/degreeApi';
-import { addUser } from '../Admin/firebase/userApi';
-import courseContent from '../Components/Assets/Data/couseContent.json'
+import bcrypt from 'bcryptjs';
+import { createUserWithEmailAndPassword } from 'firebase/auth'; 
+
 
 const options = {
   maritalStatus: [
@@ -22,6 +22,22 @@ const options = {
     { value: 'female', label: 'Female' },
     { value: 'other', label: 'Other' }
   ],
+//  applyingFor: [
+//    { value: 'certificateFamilyCounselling', label: 'Certificate in Family Counselling' },
+//    { value: 'diplomaTheology', label: 'Diploma in Theology [Dip.Th]' },
+//    { value: 'bThFastTrack', label: 'B.Th [Bachelor of Theology] - Fast track [2 years]' },
+//    { value: 'bTh3Years', label: 'B.Th (3 Years)' },
+//    { value: 'mDivFastTrack', label: 'M.Div [Master of Divinity] - Fast track [2 years]' },
+//    { value: 'mDivRegular', label: 'M.Div [Master of Divinity] Regular 2 years' },
+//    { value: 'mTh', label: 'M.Th [Master of Theology]' },
+//    { value: 'phD', label: 'Ph.D [Doctor of Philosophy]' },
+//    { value: 'dMin', label: 'D.Min [Doctorate of Ministry]' },
+//    { value: 'dD', label: 'D.D [Doctor of Divinity]' },
+//    { value: 'bThMDivIntegrated', label: 'B.Th & M.Div [Integrated Course]' },
+//    { value: 'mDivMThIntegrated', label: 'M.Div & M.Th [Integrated Course]' },
+//    { value: 'mDivDMinIntegrated', label: 'M.Div & D.Min [Integrated Course]' },
+//    { value: 'mThPhDIntegrated', label: 'M.Th & Ph.D [Integrated Course]' }
+//  ]
 };
 
 function Register() {
@@ -32,32 +48,86 @@ function Register() {
 
 
 
-  // Fetch courses from Firestore 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      const coursesSnapshot = await getAllDegrees();
-      const coursesList = coursesSnapshot?.map((doc) => ({
-        value: doc?.id,
-        label: doc.data()?.domain,
-      }));
-      console.log(courseContent)
-      setCourseOptions(coursesList);
-    };
+ // Fetch courses from Firestore 
+ useEffect(() => {
+  const fetchCourses = async () => {
+    const coursesCollection = collection(db, 'courses');
+    const coursesSnapshot = await getDocs(coursesCollection);
+    const coursesList = coursesSnapshot.docs.map((doc) => ({
+      value: doc.id, // Course ID as the value
+      label: doc.data().name, // Course name as the label
+    }));
+    setCourseOptions(coursesList);
+  };
 
-    fetchCourses();
-  }, []);
-
+  fetchCourses();
+}, []);
+  
 
   // Submit 
   const onSubmit = async (data) => {
-    const res = await addUser(data)
-    res && navigate('/login');
+    try {
+     
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(data.password, salt);
+
+
+      const signatureFile = data.signature[0];
+      const signatureRef = ref(storage, `signatures/${signatureFile.name}`);
+      await uploadBytes(signatureRef, signatureFile);
+      const signatureURL = await getDownloadURL(signatureRef);
+  
+     
+      const passportPhotoFile = data.passportSizePhoto[0];
+      const passportPhotoRef = ref(storage, `photos/${passportPhotoFile.name}`);
+      await uploadBytes(passportPhotoRef, passportPhotoFile);
+      const passportPhotoURL = await getDownloadURL(passportPhotoRef);
+  
+      
+      const educationCertFile = data.educationCertificate[0];
+      const educationCertRef = ref(storage, `certificates/${educationCertFile.name}`);
+      await uploadBytes(educationCertRef, educationCertFile);
+      const educationCertURL = await getDownloadURL(educationCertRef);
+
+     
+  
+      await addDoc(collection(db, 'users'), {
+        userId: user.uid,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        mobileNo: data.mobileNo,
+        email: data.email,
+        maritalStatus: data.maritalStatus,
+        dob: data.dob,
+        gender: data.gender,
+        applyingFor: data.applyingFor,
+        educationalQualification: data.educationalQualification,
+        theologicalQualification: data.theologicalQualification,
+        presentAddress: data.presentAddress,
+        ministryExperience: data.ministryExperience,
+        salvationExperience: data.salvationExperience,
+        signatureURL: signatureURL,           
+        passportPhotoURL: passportPhotoURL,   
+        educationCertURL: educationCertURL ,
+        username: data.username,
+        password: hashedPassword    
+      });
+  
+      console.log('Data successfully saved to Firestore and files uploaded to Storage!');
+      
+      navigate('/admin');
+    } catch (error) {
+      console.error('Error saving data or uploading files:', error);
+    }
   };
 
   return (
     <div className='register'>
       <form className="my-form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 style={{ textAlign: 'center', marginBottom: "60px" }}>Registration form</h2>
+        <h2 style={{ width: '10%', textAlign: 'center', marginBottom: "60px" }}>Registration form</h2>
         <div className="form-container">
           <div className="leftcolumn">
             <div className="form-group">
@@ -97,7 +167,7 @@ function Register() {
             <div className="form-group">
               <label>Applying for *</label>
               <Select
-                options={courseOptions}
+                options={courseOptions} 
                 onChange={(option) => setValue('applyingFor', option.value)}
               />
             </div>
@@ -144,13 +214,10 @@ function Register() {
               <label>Password *</label>
               <input type="password" placeholder="Enter Password" {...register('password', { required: true })} />
             </div>
-          </div>
-        </div>
-        <div className="form-group">
-              <input type="submit" className='submit-btn' value="Submit" />
+            <div className="form-group">
+              <input type="submit" value="Submit" />
             </div>
-            <div className="form-group" style={{ textAlign: 'center', marginTop: '20px' }}>
-          <p>Already have an account? <a href='/login'>signin</a></p> 
+          </div>
         </div>
       </form>
     </div>

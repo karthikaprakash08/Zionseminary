@@ -269,7 +269,7 @@ const CourseDetails = () => {
             className="embed-responsive-item"
             sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
             src={`https://player.vimeo.com/video/${link.split("/").pop()}`}
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: "100%", height: "55vh" }}
             allow="autoplay; encrypted-media"
           ></iframe>
         </div>
@@ -283,7 +283,7 @@ const CourseDetails = () => {
             title="PPT"
             className="embed-responsive-item"
             src={embedUrl}
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: "100%", height: "55vh" }}
             allow="autoplay; encrypted-media"
           ></iframe>
         </div>
@@ -339,7 +339,7 @@ const CourseDetails = () => {
           <ProgressBar progress={calculateProgress()} />
         </div>{" "}
       </div>
-      <div className="row secondRow">
+      <div style={{display:"flex",justifyContent:"space-evenly"}} className="row secondRow">
         <div className="col-md-8 pdy">
           <div className="videoBox">
             <div className="embed-responsive embed-responsive-16by9">
