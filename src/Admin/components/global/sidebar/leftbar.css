@@ -2,7 +2,7 @@
 .sidebar1 {
   display: none;
   flex-direction: column;
-  /* position: fixed; */
+  position: fixed;
   justify-content: space-between;
   width: 200px;
   height: 100%;
