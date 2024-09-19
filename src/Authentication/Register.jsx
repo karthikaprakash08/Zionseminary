@@ -127,7 +127,7 @@ function Register() {
   return (
     <div className='register'>
       <form className="my-form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 style={{ width: '10%', textAlign: 'center', marginBottom: "60px" }}>Registration form</h2>
+        <h2 style={{ width: '100%', textAlign: 'center', marginBottom: "60px" }}>Registration form</h2>
         <div className="form-container">
           <div className="leftcolumn">
             <div className="form-group">
@@ -216,7 +216,7 @@ function Register() {
             </div>
             <div className="form-group">
               <input type="submit" value="Submit" />
-            </div>
+            </div>           
           </div>
         </div>
       </form>
