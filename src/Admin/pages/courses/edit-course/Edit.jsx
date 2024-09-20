@@ -280,7 +280,7 @@ const Edit = ({ courseDetails }) => {
                   <ul className="lesson-subtitle-cnt">
                     {lesson?.features?.map((feature) => (
                       <li>
-                        <p className="lesson-subtitle">{feature}</p>
+                        <p className="lesson-subtitle">{feature?.name}</p>
                         <p className="lesson-duration-txt">
                           duration : {feature?.duration}
                         </p>

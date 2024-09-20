@@ -5,6 +5,15 @@ import Test from "../../../assets/Images/exam.png";
 // import { uploadDocument, uploadVedio } from "../../../api/baseApi";
 import BackIcon from "../../../assets/Images/left-arrow.png";
 import { findFileType } from "../../../hooks/newCourseFunctions";
+import { uploadFile } from "../../../firebase/lessonApi";
+
+const initialState = {
+  name: "",
+  duration: "",
+  link: "#",
+  updateIndex: null,
+  type: null,
+}
 
 const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
 
@@ -13,51 +22,19 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
     features: [],
     updateIndex: null,
   });
-  // const [currentSublesson, setCurrentSublesson] = useState({
-  //   title: "",
-  //   duration: "",
-  //   link: "#",
-  //   updateIndex: null,
-  //   type: null,
-  // });
-  const [currentSublesson, setCurrentSublesson] = useState("")
+  const [currentSublesson, setCurrentSublesson] = useState(initialState);
   const [currentUpdateIndex, setCurrentUpdateIndex] = useState(null)
-  const [sublessonFile, setSublessonFile] = useState(null);
 
-  const handleAddFile = (file) => {
-    const filetype = findFileType(file);
-    console.log("filetype", filetype);
-    setSublessonFile(file);
-    setCurrentSublesson({ ...currentSublesson, type: filetype });
+  const handleAddFile = async (file) => {
+    // const filetype = findFileType(file);
+    // console.log("filetype", filetype);
+    const link = await uploadFile(file)
+    console.log("link", link);
+    setCurrentSublesson({ ...currentSublesson, link: link });
   };
 
   const handleSubLessonsInput = (type, value) => {
     setCurrentSublesson({ ...currentSublesson, [type]: value });
-  };
-
-  const getVideoURL = async () => {
-    try {
-      const vedioFormData = new FormData();
-      vedioFormData.append("video", sublessonFile);
-      const { data } = await uploadVedio(vedioFormData);
-      console.log(data);
-      // setCurrentSublesson({...currentSublesson,url:data?.videoUrl})
-      return data?.videoUrl;
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getDocumentUrl = async () => {
-    try {
-      const vedioFormData = new FormData();
-      vedioFormData.append("document", sublessonFile);
-      const { data } = await uploadDocument(vedioFormData);
-      console.log(" doc response -> data", data);
-      return data?.url;
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const addSublessons = async () => {
@@ -69,22 +46,22 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
       ) {
         newLessons.push(currentSublesson);
         setCurrentLesson({ ...currentLesson, features: newLessons });
-        setCurrentSublesson("")
+        setCurrentSublesson(initialState)
       } else {
         newLessons[currentUpdateIndex] = currentSublesson;
         setCurrentLesson({ ...currentLesson, features: newLessons });
-        setCurrentSublesson('')
+        setCurrentSublesson(initialState)
       }
     } else if (
       currentSublesson
     ) {
       newLessons[currentSublesson.updateIndex] = currentSublesson;
       setCurrentLesson({ ...currentLesson, features: newLessons });
-      setCurrentSublesson("")
+      setCurrentSublesson(initialState)
     } else {
       newLessons[currentUpdateIndex] = currentSublesson
       setCurrentLesson({ ...currentLesson, features: newLessons });
-      setCurrentSublesson('')
+      setCurrentSublesson(initialState)
       setCurrentUpdateIndex(null)
     }
   };
@@ -174,9 +151,9 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
                 type="text"
                 name=""
                 id=""
-                value={currentSublesson}
+                value={currentSublesson.name}
                 className="sublesson-title-input"
-                onChange={(e) => setCurrentSublesson(e.target.value)}
+                onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
               />
             </div>
             <div className="sublesson-content-cover">
@@ -195,7 +172,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
               </div>
               <div className="input-cnt add-sublesson-btn">
                 <div className="sublesson-title-input center-media">
-                  <p>upload video</p>
+                  <p>upload media</p>
                   <input
                     type="file"
                     name="video-upload"
@@ -219,65 +196,65 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
         <div className="content-list">
           {currentLesson?.features?.map((sublesson, index) => (
             <div
-            className="lesson-content-input-cnt sublesson"
-            key={index}
-            style={{
-              background:
-                currentSublesson.updateIndex === index ? "#eaeaea" : null,
-            }}
-          >
-            <div className="sublesson-name-cnt">
-              <p className="sublesson-title-txt">Sub lesson Title</p>
-              <input
-                type="text"
-                name=""
-                id=""
-                value={sublesson?.name}
-                className="sublesson-title-input sublesson-card-input"
-              />
-            </div>
-            <div className="sublesson-content-cover">
-              <div className="input-cnt sublesson-title-txt">
-                <p>Duration</p>
+              className="lesson-content-input-cnt sublesson"
+              key={index}
+              style={{
+                background:
+                  currentSublesson.updateIndex === index ? "#eaeaea" : null,
+              }}
+            >
+              <div className="sublesson-name-cnt">
+                <p className="sublesson-title-txt">Sub lesson Title</p>
                 <input
                   type="text"
                   name=""
                   id=""
-                  value={sublesson?.duration}
-                  className="sublesson-duration-input sublesson-title-input sublesson-card-input"
+                  value={sublesson?.name}
+                  className="sublesson-title-input sublesson-card-input"
                 />
               </div>
-              <div className="input-cnt add-sublesson-btn">
+              <div className="sublesson-content-cover">
+                <div className="input-cnt sublesson-title-txt">
+                  <p>Duration</p>
+                  <input
+                    type="text"
+                    name=""
+                    id=""
+                    value={sublesson?.duration}
+                    className="sublesson-duration-input sublesson-title-input sublesson-card-input"
+                  />
+                </div>
+                <div className="input-cnt add-sublesson-btn">
+                  <div
+                    className="sublesson-title-input center-media sublesson-card-input"
+                    onClick={() => window.open(sublesson?.link)}
+                  >
+                    <p className="sublesson-title-txt">open media</p>
+                  </div>
+                </div>
                 <div
-                  className="sublesson-title-input center-media sublesson-card-input"
-                  onClick={() => window.open(sublesson?.link)}
-                >
-                  <p className="sublesson-title-txt">play video</p>
-                </div>
-              </div>
-              <div
-                className="add-new-lesson-btn add-sublesson-btn edit-sublesson-btn"
+                  className="add-new-lesson-btn add-sublesson-btn edit-sublesson-btn"
                 //   onClick={() => setPopupOpen(false)}
-              >
-                <div className="delete-btn">
-                  <img
-                    src={Trash}
-                    alt="delete"
-                    className="action-btn-img"
-                    onClick={() => handleRemoveSublesson(index)}
-                  />
-                </div>
-                <div className="delete-btn">
-                  <img
-                    src={Edit}
-                    alt="edit"
-                    className="action-btn-img"
-                    onClick={() => setEditSublesson(sublesson, index)}
-                  />
+                >
+                  <div className="delete-btn">
+                    <img
+                      src={Trash}
+                      alt="delete"
+                      className="action-btn-img"
+                      onClick={() => handleRemoveSublesson(index)}
+                    />
+                  </div>
+                  <div className="delete-btn">
+                    <img
+                      src={Edit}
+                      alt="edit"
+                      className="action-btn-img"
+                      onClick={() => setEditSublesson(sublesson, index)}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           ))}
         </div>
       </div>

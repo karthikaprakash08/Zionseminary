@@ -3,7 +3,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from './firebase';
 
 
-const uploadFile = async (file, folder) => {
+export const uploadFile = async (file, folder) => {
   const fileRef = ref(storage, `${folder}/${file.name}`);
   await uploadBytes(fileRef, file);
   const fileURL = await getDownloadURL(fileRef);

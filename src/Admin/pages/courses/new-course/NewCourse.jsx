@@ -90,7 +90,7 @@ const NewCourse = () => {
     }
   };
 
-  // console.log(courseData)
+  console.log(courseData)
 
   return (
     <div
@@ -192,10 +192,10 @@ const NewCourse = () => {
                   <ul className="lesson-subtitle-cnt">
                     {lesson?.features?.map((sublesson) => (
                       <li>
-                        <p className="lesson-subtitle">{sublesson}</p>
-                        {/* <p className="lesson-duration-txt">
+                        <p className="lesson-subtitle">{sublesson?.name}</p>
+                        <p className="lesson-duration-txt">
                           duration : {sublesson?.duration}
-                        </p> */}
+                        </p>
                       </li>
                     ))}
                   </ul>
