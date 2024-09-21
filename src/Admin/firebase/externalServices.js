@@ -1,10 +1,13 @@
 import axios from 'axios';
 
 
-const VIMEO_ACCESS_TOKEN = 'vimeo_access_token';
-
 const GOOGLE_DRIVE_ACCESS_TOKEN = 'google_drive_access_token';
-const GOOGLE_DRIVE_FOLDER_ID = 'google_drive_folder_id'; 
+const GOOGLE_DRIVE_FOLDER_ID = 'https://drive.google.com/drive/folders/1KF3TAUkmwPqISMEkL9Z3hbJSIVE-OiRD?usp=drive_link'; 
+
+//VIMEO_CLIENT_ID=c70a003a069e9372eae2fe941bc286725160632c
+//VIMEO_CLIENT_SECRET=6DBDo6PPZbWRenXHqxwnhqohxp/KfJBBokjtLM+QwLwLRgsFdQYbMzFRWJzez0e7D1Whg7n+lBuKzMb1PzkV/YNBW1O5Fpi6OvtX+MPVmPH07ySB5o06sGGux0lXE9BS";
+const VIMEO_ACCESS_TOKEN= "f35cd45fcf73174cb0415288bd62cbca";
+
 
 export const uploadToVimeo = async (file) => {
   try {
