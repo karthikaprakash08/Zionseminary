@@ -3,19 +3,23 @@ import { db } from './firebase';
 import { uploadToVimeo, uploadToDrive } from './externalServices'; 
 import { v4 as uuidv4 } from 'uuid'; 
 
+export const uploadFile = async (file) => {
+  
+  return 'uploaded_file_url'; 
+};
+
 export const addLesson = async (lessonData) => {
   try {
-    
     const lessonId = uuidv4();
     const features = await Promise.all(
       lessonData.features.map(async (sublesson) => {
         let fileURL = '';
         
-        // video upload to Vimeo
+        // Video upload to Vimeo
         if (sublesson.type === 'video' && sublesson.file) {
           fileURL = await uploadToVimeo(sublesson.file);
         } 
-        //  document (PPT/PDF) upload to Google Drive
+        // Document (PPT/PDF) upload to Google Drive
         else if (sublesson.type === 'document' && sublesson.file) {
           fileURL = await uploadToDrive(sublesson.file);
         }
@@ -55,11 +59,11 @@ export const editLesson = async (lessonId, lessonData) => {
       lessonData.features.map(async (sublesson) => {
         let fileURL = '';
 
-        //  video upload to Vimeo
+        // Video upload to Vimeo
         if (sublesson.type === 'video' && sublesson.file) {
           fileURL = await uploadToVimeo(sublesson.file);
         } 
-        // document upload to Google Drive
+        // Document upload to Google Drive
         else if (sublesson.type === 'document' && sublesson.file) {
           fileURL = await uploadToDrive(sublesson.file);
         }
