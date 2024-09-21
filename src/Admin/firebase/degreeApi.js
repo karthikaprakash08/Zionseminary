@@ -1,36 +1,54 @@
-import { collection, deleteDoc, doc, getDocs, setDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "./firebase";
+import { storage } from "./firebase"; 
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; 
+
+const uploadFile = async (file) => {
+    const storageRef = ref(storage, `thumbnails/${file.name}`);
+    await uploadBytes(storageRef, file);
+    const fileURL = await getDownloadURL(storageRef);
+    return fileURL;  
+};
 
 export const getAllDegrees = async () => {
     try {
         const data = await getDocs(collection(db, 'courses'));
-        return data?.docs;
+        return data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
-        console.log(error);
+        console.error('Error fetching degrees:', error);
     }
 };
+
 
 export const setNewDegree = async (newDegreeData) => {
     try {
         const id = uuidv4(); 
         const docRef = doc(db, 'courses', id);
-        await setDoc(docRef, { ...newDegreeData, id }); // Add ID to the course
-        return true;
+
+        // Handle thumbnail 
+        if (newDegreeData.thumbnail) {
+            const thumbnailURL = await uploadFile(newDegreeData.thumbnail);
+            newDegreeData.thumbnail = thumbnailURL; 
+        }
+
+        await setDoc(docRef, { ...newDegreeData, id }); 
     } catch (error) {
-        console.log(error);
+        console.error('Error setting new degree:', error);
     }
 };
+
 
 export const updateDegree = async (updatedData, docId) => {
     try {
         const docRef = doc(db, 'courses', docId);
-        await setDoc(docRef, updatedData);
+        await updateDoc(docRef, updatedData); // Use updateDoc to keep existing fields
         return true;
     } catch (error) {
-        console.log(error);
+        console.error('Error updating degree:', error);
     }
 };
+
 
 export const deleteDegree = async (docId) => {
     try {
