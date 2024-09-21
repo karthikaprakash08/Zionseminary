@@ -24,6 +24,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
   });
   const [currentSublesson, setCurrentSublesson] = useState(initialState);
   const [currentUpdateIndex, setCurrentUpdateIndex] = useState(null)
+  const [uploadingFile, setUploadingFile] = useState(false)
 
   const handleAddFile = async (file) => {
     // const filetype = findFileType(file);
@@ -83,7 +84,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
     setCurrentLesson({ ...currentLesson, features: newsubLessons });
   };
 
-  console.log(currentLesson, currentUpdateIndex);
+  console.log(currentSublesson, currentUpdateIndex);
 
   useEffect(() => {
     if (editData) setCurrentLesson(editData);
@@ -172,7 +173,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
               </div>
               <div className="input-cnt add-sublesson-btn">
                 <div className="sublesson-title-input center-media">
-                  <p>upload media</p>
+                  <p>{currentSublesson.link ? 'new media' : 'upload media'}</p>
                   <input
                     type="file"
                     name="video-upload"
@@ -188,7 +189,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
                 className="add-new-lesson-btn add-sublesson-btn"
                 onClick={() => addSublessons()}
               >
-                Add
+                {currentUpdateIndex !== null ? 'Update' : 'Add'}
               </div>
             </div>
           </div>
