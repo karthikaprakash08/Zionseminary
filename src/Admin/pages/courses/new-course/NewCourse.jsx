@@ -35,31 +35,7 @@ const NewCourse = () => {
   const handledirectInput = (type, value) => {
     setCourseData({ ...courseData, [type]: value });
   };
-
-  const handleOverviewInput = (type, value) => {
-    setCurrentOverview({ ...currentOverview, [type]: value });
-  };
-
-  const addNewOverview = () => {
-    if (currentOverview.title && currentOverview.description) {
-      const newOverview = courseData.overviewPoints;
-      if (currentOverview.updateIndex === null) {
-        newOverview.push({
-          ...currentOverview,
-          updateIndex: newOverview.length > 0 ? newOverview?.length : 0,
-        });
-        setCourseData({ ...courseData, overviewPoints: newOverview });
-      } else {
-        newOverview[currentOverview?.updateIndex] = currentOverview;
-        setCourseData({ ...courseData, overviewPoints: newOverview });
-      }
-      setCurrentOverview({
-        heading: "",
-        content: "",
-        updateIndex: null,
-      });
-    }
-  };
+  
 
   const addLessontoCourse = (lesson) => {
     console.log(lesson)

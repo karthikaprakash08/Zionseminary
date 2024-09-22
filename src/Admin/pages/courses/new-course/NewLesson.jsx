@@ -27,9 +27,9 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
   const [uploadingFile, setUploadingFile] = useState(false)
 
   const handleAddFile = async (file) => {
-    // const filetype = findFileType(file);
-    // console.log("filetype", filetype);
-    const link = await uploadFile(file)
+    const filetype = findFileType(file);
+    console.log("filetype", filetype);
+    const link = await uploadFile(file, filetype)
     console.log("link", link);
     setCurrentSublesson({ ...currentSublesson, link: link });
   };

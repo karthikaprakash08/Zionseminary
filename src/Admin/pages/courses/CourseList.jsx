@@ -16,13 +16,7 @@ const CourseList = () => {
       try {
         if (courses === null) {
           const QueryDocumentSnapshots = await getAllDegrees();
-          const degrees = QueryDocumentSnapshots?.map((doc) => {
-            return {
-              id: doc?.id,
-              ...doc.data()
-            }
-          })
-          SetCourses(degrees);
+          SetCourses(QueryDocumentSnapshots);
         }
       } catch (error) {
         console.log(error);

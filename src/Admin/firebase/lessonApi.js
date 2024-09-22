@@ -1,12 +1,24 @@
 import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from './firebase';
-import { uploadToVimeo, uploadToDrive } from './externalServices'; 
-import { v4 as uuidv4 } from 'uuid'; 
+import { uploadToVimeo, uploadToDrive } from './externalServices';
+import { v4 as uuidv4 } from 'uuid';
 
-export const uploadFile = async (file) => {
-  
-  return 'uploaded_file_url'; 
+
+export const uploadFile = async (file, type) => {
+  let fileURL = '';
+  if (type === 'video') {
+    fileURL = await uploadToVimeo(file);
+    console.log(fileURL);
+  }
+  if (type === 'pdf' || type === "ppt" || type === "document") {
+    fileURL = await uploadToDrive(file)
+    console.log(fileURL);
+  }
+  // const fileRef = ref(storage, `${folder}/${file.name}`);
+  // await uploadBytes(fileRef, file);
+  return fileURL;
 };
+
 
 export const addLesson = async (lessonData) => {
   try {
@@ -14,27 +26,24 @@ export const addLesson = async (lessonData) => {
     const features = await Promise.all(
       lessonData.features.map(async (sublesson) => {
         let fileURL = '';
-        
         // Video upload to Vimeo
         if (sublesson.type === 'video' && sublesson.file) {
           fileURL = await uploadToVimeo(sublesson.file);
-        } 
+        }
         // Document (PPT/PDF) upload to Google Drive
         else if (sublesson.type === 'document' && sublesson.file) {
           fileURL = await uploadToDrive(sublesson.file);
         }
-        
-        return { ...sublesson, link: fileURL }; 
+
+        return { ...sublesson, link: fileURL };
       })
     );
-
     await addDoc(collection(db, 'lessons'), {
-      id: lessonId, 
+      id: lessonId,
       name: lessonData.name,
-      features, 
+      features,
       createdAt: Date.now()
     });
-
     console.log('Lesson successfully saved to Firestore!');
     return true;
   } catch (error) {
@@ -62,7 +71,7 @@ export const editLesson = async (lessonId, lessonData) => {
         // Video upload to Vimeo
         if (sublesson.type === 'video' && sublesson.file) {
           fileURL = await uploadToVimeo(sublesson.file);
-        } 
+        }
         // Document upload to Google Drive
         else if (sublesson.type === 'document' && sublesson.file) {
           fileURL = await uploadToDrive(sublesson.file);
