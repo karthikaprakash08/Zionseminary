@@ -22,17 +22,18 @@ export const getAllDegrees = async () => {
 
 
 export const setNewDegree = async (newDegreeData) => {
+    console.log("adding new degree:", newDegreeData)
     try {
         const id = uuidv4(); 
         const docRef = doc(db, 'courses', id);
-
         // Handle thumbnail 
         if (newDegreeData.thumbnail) {
             const thumbnailURL = await uploadFile(newDegreeData.thumbnail);
             newDegreeData.thumbnail = thumbnailURL; 
         }
-
         await setDoc(docRef, { ...newDegreeData, id }); 
+        console.log("waiting")
+        return true
     } catch (error) {
         console.error('Error setting new degree:', error);
     }

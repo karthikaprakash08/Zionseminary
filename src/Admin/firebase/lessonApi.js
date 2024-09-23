@@ -1,16 +1,21 @@
 import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
-import { db } from './firebase';
-import { uploadToVimeo, uploadToDrive } from './externalServices'; 
-import { v4 as uuidv4 } from 'uuid'; 
+import { db, storage } from './firebase';
+import { uploadToVimeo, uploadToDrive } from './externalServices';
+import { v4 as uuidv4 } from 'uuid';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+
 
 export const uploadFile = async (file, type) => {
   let fileURL = '';
-
   try {
     if (type === 'video') {
-      fileURL = await uploadToVimeo(file);  // Upload to Vimeo for videos
-    } else if (type === 'document'|| type === 'pdf' || type === 'ppt') {
-      fileURL = await uploadToDrive(file);  // Upload to Google Drive for documents
+      fileURL = await uploadToVimeo(file);
+    } else if (type === 'document' || type === 'pdf' || type === 'ppt') {
+      console.log('initialize file upload : running')
+      const fileRef = ref(storage, `${'documents'}/${file.name}`);
+      await uploadBytes(fileRef, file);
+      fileURL = await getDownloadURL(fileRef);
+      console.log('url',fileURL);
     }
     return fileURL;
   } catch (error) {
@@ -27,12 +32,13 @@ export const addLesson = async (lessonData) => {
         let fileURL = '';
 
         if (sublesson.file) {
-          fileURL = await uploadFile(sublesson.file, sublesson.type); 
+          fileURL = await uploadFile(sublesson.file, sublesson.type);
         }
 
         return { ...sublesson, link: fileURL }; 
       })
     );
+
 
     await addDoc(collection(db, 'lessons'), {
       id: lessonId, 
@@ -40,6 +46,7 @@ export const addLesson = async (lessonData) => {
       features, 
       createdAt: Date.now()
     });
+
 
     console.log('Lesson successfully saved to Firestore!');
     return true;
@@ -66,7 +73,7 @@ export const editLesson = async (lessonId, lessonData) => {
         let fileURL = '';
 
         if (sublesson.file) {
-          fileURL = await uploadFile(sublesson.file, sublesson.type);  
+          fileURL = await uploadFile(sublesson.file, sublesson.type);
         }
 
         return { ...sublesson, link: fileURL };

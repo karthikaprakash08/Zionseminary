@@ -10,7 +10,7 @@ import { uploadFile } from "../../../firebase/lessonApi";
 const initialState = {
   name: "",
   duration: "",
-  link: "#",
+  link: "",
   updateIndex: null,
   type: null,
 }
@@ -27,11 +27,13 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
   const [uploadingFile, setUploadingFile] = useState(false)
 
   const handleAddFile = async (file) => {
+    setUploadingFile(true)
     const filetype = findFileType(file);
     console.log("filetype", filetype);
     const link = await uploadFile(file, filetype)
     console.log("link", link);
     setCurrentSublesson({ ...currentSublesson, link: link });
+    setUploadingFile(false)
   };
 
   const handleSubLessonsInput = (type, value) => {
@@ -53,9 +55,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
         setCurrentLesson({ ...currentLesson, features: newLessons });
         setCurrentSublesson(initialState)
       }
-    } else if (
-      currentSublesson
-    ) {
+    } else if (currentSublesson) {
       newLessons[currentSublesson.updateIndex] = currentSublesson;
       setCurrentLesson({ ...currentLesson, features: newLessons });
       setCurrentSublesson(initialState)
@@ -173,7 +173,10 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
               </div>
               <div className="input-cnt add-sublesson-btn">
                 <div className="sublesson-title-input center-media">
-                  <p>{currentSublesson.link ? 'new media' : 'upload media'}</p>
+                  <p></p>
+                  {currentSublesson.link.length > 5 && !uploadingFile && (<p>media uploaded</p>)}
+                  {currentSublesson.link.length < 5 && !uploadingFile && (<p> upload media</p>)}
+                  {uploadingFile && (<p>uploading..</p>)}
                   <input
                     type="file"
                     name="video-upload"

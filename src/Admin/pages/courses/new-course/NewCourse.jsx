@@ -62,6 +62,7 @@ const NewCourse = () => {
     ) {
       // const courseFormData = convertToCourseFormData(courseData)
       const response = await setNewDegree(courseData);
+      console.log(response);
       if (response) navigate('/admin')
     }
   };
