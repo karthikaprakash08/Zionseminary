@@ -9,7 +9,7 @@ export const uploadFile = async (file, type) => {
   try {
     if (type === 'video') {
       fileURL = await uploadToVimeo(file);  // Upload to Vimeo for videos
-    } else if (type === 'document') {
+    } else if (type === 'document'|| type === 'pdf' || type === 'ppt') {
       fileURL = await uploadToDrive(file);  // Upload to Google Drive for documents
     }
     return fileURL;
