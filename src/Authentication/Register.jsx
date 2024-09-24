@@ -57,7 +57,7 @@ function Register() {
   return (
     <div className='register'>
       <form className="my-form" onSubmit={handleSubmit(onSubmit)}>
-        <h2 style={{ width: '10%', textAlign: 'center', marginBottom: "60px" }}>Registration form</h2>
+        <h2 style={{ width: '50%', textAlign: 'center', marginBottom: "60px" }}>Registration form</h2>
         <div className="form-container">
           <div className="leftcolumn">
             <div className="form-group">
@@ -144,8 +144,8 @@ function Register() {
               <label>Password *</label>
               <input type="password" placeholder="Enter Password" {...register('password', { required: true })} />
             </div>
-            <div className="form-group">
-              <input type="submit" value="Submit" />
+            <div className="form-group ">
+              <input type="submit" value="Submit" className='submit-bottom-btn' />
             </div>
           </div>
         </div>

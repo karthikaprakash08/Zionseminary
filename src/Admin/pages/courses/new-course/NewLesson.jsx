@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import Trash from "../../../assets/Images/trash.png";
 import Edit from "../../../assets/Images/edit.png";
 import Test from "../../../assets/Images/exam.png";
+
 // import { uploadDocument, uploadVedio } from "../../../api/baseApi";
 import BackIcon from "../../../assets/Images/left-arrow.png";
 import { findFileType } from "../../../hooks/newCourseFunctions";
 import { uploadFile } from "../../../firebase/lessonApi";
+import AddTest from "./AddTest";
 
 const initialState = {
   name: "",
@@ -21,10 +23,12 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
     name: null,
     features: [],
     updateIndex: null,
+    testId:null
   });
   const [currentSublesson, setCurrentSublesson] = useState(initialState);
   const [currentUpdateIndex, setCurrentUpdateIndex] = useState(null)
   const [uploadingFile, setUploadingFile] = useState(false)
+  const [openTest,setOpenTest] = useState({open:false,data:null})
 
   const handleAddFile = async (file) => {
     setUploadingFile(true)
@@ -104,6 +108,15 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
   return (
     <div className="lesson-popup-cnt">
       <div className="lesson-new-cnt">
+      {openTest.open && (
+          <AddTest
+            testId={currentLesson?.testId}
+            addTest={(data) => {
+              setCurrentLesson({ ...currentLesson, testId: data });
+            }}
+            closeTest={() => setOpenTest({ open: false })}
+          />
+        )}
         <div className="form-right-header">
           <div className="back-btn" onClick={() => cancel()}>
             <img src={BackIcon} alt="back" className="back-icon-img" />
@@ -144,6 +157,20 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
                 })
               }
             />
+            <div
+              className="lesson-test-overview-cnt"
+              onClick={() =>
+                setOpenTest({ open: true, data: currentLesson.testId })
+              }
+            >
+              <img src={Test} alt="test" className="test" />
+              <p>
+                {!currentLesson?.testId?.length > 3
+                  ? "No Tests has been created for this lesson"
+                  : `Test click to update`}
+              </p>
+              {/* <div className="lesson-test-overview-btn"></div> */}
+            </div>
           </div>
           <div className="lesson-content-input-cnt">
             <div className="sublesson-name-cnt">

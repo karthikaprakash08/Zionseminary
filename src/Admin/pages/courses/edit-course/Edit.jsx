@@ -261,7 +261,7 @@ const Edit = ({ courseDetails }) => {
                 className="add-new-lesson-btn"
                 onClick={() => setPopupOpen({ open: true, data: null })}
               >
-                Add new lesson{" "}
+                Add new Course
               </div>
             )}
           </div>

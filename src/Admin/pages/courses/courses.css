@@ -581,10 +581,9 @@ input[type="file"]::file-selector-button:active {
   justify-content: space-between;
   align-items: center;
   border-radius: 0.5rem;
-  background: #c9b4f1b7;
+  background: #8bb8f2b7;
   padding: 0 1rem;
   cursor: pointer;
-
   &:hover {
     box-shadow: 1px 1px 10px 1px #dadadab7;
   }

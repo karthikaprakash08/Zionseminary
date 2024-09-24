@@ -52,7 +52,25 @@ h2 {
 }
 
 .form-group {
+  margin-bottom: 1rem;
+}
+
+.submit-bottom-btn {
+  outline: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10rem;
+  height: 2.5rem;
+  border-radius: .25rem;
+  background: rgb(43, 145, 204);
   margin-bottom: 20px;
+  margin-top: 1rem;
+  align-self: center;
+  color: #eaebed;
+  font-weight: 500;
+  font-size: 1.1rem;
 }
 
 label {
