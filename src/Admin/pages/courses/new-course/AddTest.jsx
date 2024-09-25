@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { convertToUTC } from "../../../hooks/newCourseFunctions";
+import ToggleBtn from "../../../components/Test/ToggleBtn";
 
 const AddTest = ({ testId, closeTest, addTest }) => {
   const initialMCQState = {
@@ -39,13 +40,13 @@ const AddTest = ({ testId, closeTest, addTest }) => {
   }, [testId]);
 
   useEffect(() => {
-    if(currentTestType === 'MCQ') {
+    if (currentTestType === 'MCQ') {
       setCurrentQuestion(initialMCQState)
     }
-    if(currentTestType === 'paragraph'){
+    if (currentTestType === 'paragraph') {
 
     }
-  },[currentTestType]);
+  }, [currentTestType]);
 
   const handleChoiceSelect = (index, value) => {
     setDropDown(false);
@@ -156,6 +157,19 @@ const AddTest = ({ testId, closeTest, addTest }) => {
             />
           </div>
         </div>
+        <div className="test-type-toggle-cnt">
+          <p>Select Question Type</p>
+          <div className="toggle-btn-cnt">
+            <p>MCQ</p>
+            <ToggleBtn
+              leftValue={'MCQ'}
+              RightValue={'Para'}
+              currentValue={currentTestType}
+              handleToggle={(value) => setCurrentTestType(value)}
+            />
+            <p>Parag</p>
+          </div>
+        </div>
         <div className="duration-input-cnt ">
           <p>Set Duration</p>
           <div className="timer-cover">
@@ -223,7 +237,7 @@ const AddTest = ({ testId, closeTest, addTest }) => {
         </div>
       </div>
       <div className="question-inputs-cnt">
-        <div className="question-input-cnt">
+        <div className={`question-input-cnt ${currentTestType !== 'MCQ' && 'pargaraph-question'}`}>
           <p>Question</p>
           <textarea
             className="question-input"
@@ -236,97 +250,99 @@ const AddTest = ({ testId, closeTest, addTest }) => {
             }
           />
         </div>
-        <div className="choice-cnt">
-          <div className="choice-header">
-            <p>Choices</p>
-            <div className="select-answer-cnt">
-              <p>Select Answer</p>
-              <div className="selected-choice-display">
-                <p onClick={() => setDropDown(true)}>
-                  {currentQuestion?.correctAnswer
-                    ? currentQuestion?.correctAnswer
-                    : "Not selected"}
-                </p>
-                {dropDown && (
-                  <div className="drop-down-cnt">
-                    <div
-                      className="drop-down-choice"
-                      onClick={() => handleChoiceSelect(0, "Choice one")}
-                    >
-                      <p>Choice one</p>
+        {
+          currentTestType === 'MCQ' && (<div className="choice-cnt">
+            <div className="choice-header">
+              <p>Choices</p>
+              <div className="select-answer-cnt">
+                <p>Select Answer</p>
+                <div className="selected-choice-display">
+                  <p onClick={() => setDropDown(true)}>
+                    {currentQuestion?.correctAnswer
+                      ? currentQuestion?.correctAnswer
+                      : "Not selected"}
+                  </p>
+                  {dropDown && (
+                    <div className="drop-down-cnt">
+                      <div
+                        className="drop-down-choice"
+                        onClick={() => handleChoiceSelect(0, "Choice one")}
+                      >
+                        <p>Choice one</p>
+                      </div>
+                      <div
+                        className="drop-down-choice"
+                        onClick={() => handleChoiceSelect(1, "Choice two")}
+                      >
+                        <p>Choice two</p>
+                      </div>
+                      <div
+                        className="drop-down-choice"
+                        onClick={() => handleChoiceSelect(2, "Choice three")}
+                      >
+                        <p>Choice three</p>
+                      </div>
+                      <div
+                        className="drop-down-choice"
+                        onClick={() => handleChoiceSelect(3, "Choice four")}
+                      >
+                        <p>Choice four</p>
+                      </div>
                     </div>
-                    <div
-                      className="drop-down-choice"
-                      onClick={() => handleChoiceSelect(1, "Choice two")}
-                    >
-                      <p>Choice two</p>
-                    </div>
-                    <div
-                      className="drop-down-choice"
-                      onClick={() => handleChoiceSelect(2, "Choice three")}
-                    >
-                      <p>Choice three</p>
-                    </div>
-                    <div
-                      className="drop-down-choice"
-                      onClick={() => handleChoiceSelect(3, "Choice four")}
-                    >
-                      <p>Choice four</p>
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="choice">
-            <p>Choice one</p>
-            <input
-              type="text"
-              name=""
-              placeholder="Enter choice one"
-              value={
-                currentQuestion?.options[0] ? currentQuestion?.options[0] : ""
-              }
-              onChange={(e) => handleChoiceInput(0, e.target.value)}
-            />
-          </div>
-          <div className="choice">
-            <p>Choice two</p>
-            <input
-              type="text"
-              name=""
-              placeholder="Enter choice two"
-              value={
-                currentQuestion?.options[1] ? currentQuestion?.options[1] : ""
-              }
-              onChange={(e) => handleChoiceInput(1, e.target.value)}
-            />
-          </div>
-          <div className="choice">
-            <p>Choice three</p>
-            <input
-              type="text"
-              name=""
-              placeholder="Enter choice three"
-              value={
-                currentQuestion?.options[2] ? currentQuestion?.options[2] : ""
-              }
-              onChange={(e) => handleChoiceInput(2, e.target.value)}
-            />
-          </div>
-          <div className="choice">
-            <p>Choice four</p>
-            <input
-              type="text"
-              name=""
-              placeholder="Enter choice four"
-              value={
-                currentQuestion?.options[3] ? currentQuestion?.options[3] : ""
-              }
-              onChange={(e) => handleChoiceInput(3, e.target.value)}
-            />
-          </div>
-        </div>
+            <div className="choice">
+              <p>Choice one</p>
+              <input
+                type="text"
+                name=""
+                placeholder="Enter choice one"
+                value={
+                  currentQuestion?.options[0] ? currentQuestion?.options[0] : ""
+                }
+                onChange={(e) => handleChoiceInput(0, e.target.value)}
+              />
+            </div>
+            <div className="choice">
+              <p>Choice two</p>
+              <input
+                type="text"
+                name=""
+                placeholder="Enter choice two"
+                value={
+                  currentQuestion?.options[1] ? currentQuestion?.options[1] : ""
+                }
+                onChange={(e) => handleChoiceInput(1, e.target.value)}
+              />
+            </div>
+            <div className="choice">
+              <p>Choice three</p>
+              <input
+                type="text"
+                name=""
+                placeholder="Enter choice three"
+                value={
+                  currentQuestion?.options[2] ? currentQuestion?.options[2] : ""
+                }
+                onChange={(e) => handleChoiceInput(2, e.target.value)}
+              />
+            </div>
+            <div className="choice">
+              <p>Choice four</p>
+              <input
+                type="text"
+                name=""
+                placeholder="Enter choice four"
+                value={
+                  currentQuestion?.options[3] ? currentQuestion?.options[3] : ""
+                }
+                onChange={(e) => handleChoiceInput(3, e.target.value)}
+              />
+            </div>
+          </div>)
+        }
       </div>
       <div className="action-btns-cnt">
         <div

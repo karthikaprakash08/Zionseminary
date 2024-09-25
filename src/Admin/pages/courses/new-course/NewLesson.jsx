@@ -173,6 +173,22 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
             </div>
           </div>
           <div className="lesson-content-input-cnt">
+          <div className="sublesson-name-cnt">
+              <p>Course description</p>
+              <textarea
+                type="text"
+                name=""
+                id=""
+                // value={currentSublesson.name}
+                className="sublesson-title-input"
+                // onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
+              />
+            </div>
+            <div className="add-newLesson-btn">
+<p>Add New Lesson </p>
+            </div>
+          </div>
+          {/* <div className="lesson-content-input-cnt">
             <div className="sublesson-name-cnt">
               <p>Lesson Title</p>
               <input
@@ -222,7 +238,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
                 {currentUpdateIndex !== null ? 'Update' : 'Add'}
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="content-list">
           {currentLesson?.features?.map((sublesson, index) => (

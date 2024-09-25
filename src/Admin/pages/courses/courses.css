@@ -584,6 +584,7 @@ input[type="file"]::file-selector-button:active {
   background: #8bb8f2b7;
   padding: 0 1rem;
   cursor: pointer;
+
   &:hover {
     box-shadow: 1px 1px 10px 1px #dadadab7;
   }
@@ -695,6 +696,23 @@ input[type="file"]::file-selector-button:active {
   align-self: flex-end;
 }
 
+.add-newLesson-btn{
+width: 100%;
+height: 2.5rem;
+border-radius:.5rem;
+display: flex;
+align-items: center;
+justify-content: center;
+color: whitesmoke;
+font-size: 1.1rem;
+font-weight: 500;
+background-color: #6399eb;
+cursor: pointer;
+&:hover{
+  background-color: #4279cc;
+}
+}
+
 .edit-sublesson-btn {
   display: flex;
   justify-content: space-around;
@@ -788,6 +806,20 @@ input[type="file"]::file-selector-button:active {
   /* background: transparent; */
 }
 
+.test-type-toggle-cnt {
+  width: fit-content;
+  height: 4rem;
+  /* background: #c4c4c4; */
+  padding: 0rem 1rem;
+}
+
+.toggle-btn-cnt {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .questions-block-cnt {
   width: 100%;
   min-height: 8rem;
@@ -830,6 +862,10 @@ input[type="file"]::file-selector-button:active {
   width: 100%;
   min-height: 100%;
   padding: 1rem;
+}
+
+.pargaraph-question {
+  width: 100%;
 }
 
 .question-input {
@@ -1000,7 +1036,7 @@ input[type="file"]::file-selector-button:active {
     gap: 2rem;
   }
 
-  .course-card{
+  .course-card {
     height: 20rem;
   }
 
@@ -1161,6 +1197,11 @@ input[type="file"]::file-selector-button:active {
     width: 50%;
     min-height: 100%;
     padding: 1rem;
+  }
+
+  .pargaraph-question {
+    width: 100%;
+    height: 20rem;
   }
 
   .choice-cnt {
