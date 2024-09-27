@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import BackIcon from "../../assets/Images/left-arrow.png";
 import { findFileType } from '../../hooks/newCourseFunctions';
+import Test from "../../assets/Images/exam.png";
+import Trash from "../../assets/Images/trash.png";
+import Edit from "../../assets/Images/edit.png";
+import Upload from "../../assets/Images/upload.png";
+
 
 const initialState = {
   name: "",
@@ -111,14 +116,14 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
             {editData && (
               <div
                 className="add-new-lesson-btn cancel-btn"
-              // onClick={() => handleDelete()}
+              onClick={() => handleDelete()}
               >
                 Delete Course
               </div>
             )}
             <div
               className="add-new-lesson-btn"
-            // onClick={() => validateAndUpdateLesson()}
+            onClick={() => validateAndUpdateLesson()}
             >
               Add to Course
             </div>
@@ -131,9 +136,9 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
               type="text"
               name=""
               id=""
-              // value={currentSublesson.name}
+              value={currentSublesson.name}
               className="sublesson-title-input"
-            // onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
+            onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
             />
           </div>
           <div className="lesson-content-input-cnt">
@@ -143,9 +148,9 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                 type="text"
                 name=""
                 id=""
-                // value={currentSublesson.name}
+                value={currentSublesson.name}
                 className="sublesson-title-input"
-              // onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
+              onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
               />
             </div>
             <div className="sublesson-content-cover">
@@ -156,15 +161,15 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                   name=""
                   id=""
                   className="sublesson-duration-input sublesson-title-input "
-                // value={currentSublesson.duration}
-                // onChange={(e) =>
-                //   handleSubLessonsInput("duration", e.target.value)
-                // }
+                value={currentSublesson.duration}
+                onChange={(e) =>
+                  handleSubLessonsInput("duration", e.target.value)
+                }
                 />
               </div>
               <div className="input-cnt add-sublesson-btn flex-input">
                 <div className="sublesson-title-input center-media">
-                  <p></p>
+                  <img src={Upload} alt="imag" className='test-icon' />
                   {/* {currentSublesson.link.length > 5 && !uploadingFile && (<p>media uploaded</p>)}
                   {currentSublesson.link.length < 5 && !uploadingFile && (<p> upload media</p>)}
                   {uploadingFile && (<p>uploading..</p>)} */}
@@ -175,11 +180,11 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                     style={{ position: "absolute" }}
                     id=""
                     className="file-title-input"
-                  // onChange={(e) => handleAddFile(e.target.files[0])}
+                  onChange={(e) => handleAddFile(e.target.files[0])}
                   />
                 </div>
                 <div className="sublesson-title-input center-media">
-                  <p>test</p>
+                  <img src={Test} alt="imag" className='test-icon' />
                   {/* {currentSublesson.link.length > 5 && !uploadingFile && (<p>media uploaded</p>)}
                   {currentSublesson.link.length < 5 && !uploadingFile && (<p> upload media</p>)}
                   {uploadingFile && (<p>uploading..</p>)} */}
@@ -187,15 +192,76 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
               </div>
               <div
                 className="add-new-lesson-btn add-sublesson-btn"
-              // onClick={() => addSublessons()}
+              onClick={() => addSublessons()}
               >
-                {/* {currentUpdateIndex !== null ? 'Update' : 'Add'} */}
+                {currentUpdateIndex !== null ? 'Update' : 'Add'}
               </div>
             </div>
           </div>
         </div>
         <div className="content-list">
-
+          {currentLesson?.features?.map((sublesson, index) => (
+            <div
+              className="lesson-content-input-cnt sublesson"
+              key={index}
+              style={{
+                background:
+                  currentSublesson.updateIndex === index ? "#eaeaea" : null,
+              }}
+            >
+              <div className="sublesson-name-cnt">
+                <p className="sublesson-title-txt">Sub lesson Title</p>
+                <input
+                  type="text"
+                  name=""
+                  id=""
+                  value={sublesson?.name}
+                  className="sublesson-title-input sublesson-card-input"
+                />
+              </div>
+              <div className="sublesson-content-cover">
+                <div className="input-cnt sublesson-title-txt">
+                  <p>Duration</p>
+                  <input
+                    type="text"
+                    name=""
+                    id=""
+                    value={sublesson?.duration}
+                    className="sublesson-duration-input sublesson-title-input sublesson-card-input"
+                  />
+                </div>
+                <div className="input-cnt add-sublesson-btn">
+                  <div
+                    className="sublesson-title-input center-media sublesson-card-input"
+                    onClick={() => window.open(sublesson?.link)}
+                  >
+                    <p className="sublesson-title-txt">open media</p>
+                  </div>
+                </div>
+                <div
+                  className="add-new-lesson-btn add-sublesson-btn edit-sublesson-btn"
+                //   onClick={() => setPopupOpen(false)}
+                >
+                  <div className="delete-btn">
+                    <img
+                      src={Trash}
+                      alt="delete"
+                      className="action-btn-img"
+                      onClick={() => handleRemoveSublesson(index)}
+                    />
+                  </div>
+                  <div className="delete-btn">
+                    <img
+                      src={Edit}
+                      alt="edit"
+                      className="action-btn-img"
+                      onClick={() => setEditSublesson(sublesson, index)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

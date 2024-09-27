@@ -1025,6 +1025,7 @@ cursor: pointer;
   justify-content: center;
   align-items: center;
   padding: .2rem;
+  /* overflow: scroll; */
 }
 
 .lesson-popup{
@@ -1033,6 +1034,7 @@ cursor: pointer;
   background-color: #ffff;
   border-radius: 1.5rem;
   padding: 1.5rem;
+  overflow: hidden;
 }
 .lesson-data-inputs-cnt{
   width: 100%;
@@ -1043,6 +1045,12 @@ cursor: pointer;
 }
 .lesson-name-cnt{
   width: 40%;
+}
+
+.test-icon{
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
 }
 
 @media (min-width: 700px) {

@@ -26,7 +26,9 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
       <div className="lesson-new-cnt">
         {
           openLessonPopUP.open && (
-            <LessonPopUp />
+            <LessonPopUp 
+            cancel={()=>setOPenLessonPopUP({open:false, data: null})}
+            />
           )
         }
         {openTest.open && (
@@ -111,68 +113,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
           </div>
         </div>
         <div className="content-list">
-          {currentCourse?.packages?.map((sublesson, index) => (
-            <div
-              className="lesson-content-input-cnt sublesson"
-              key={index}
-              style={{
-                background:
-                  currentSublesson.updateIndex === index ? "#eaeaea" : null,
-              }}
-            >
-              <div className="sublesson-name-cnt">
-                <p className="sublesson-title-txt">Sub lesson Title</p>
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  value={sublesson?.name}
-                  className="sublesson-title-input sublesson-card-input"
-                />
-              </div>
-              <div className="sublesson-content-cover">
-                <div className="input-cnt sublesson-title-txt">
-                  <p>Duration</p>
-                  <input
-                    type="text"
-                    name=""
-                    id=""
-                    value={sublesson?.duration}
-                    className="sublesson-duration-input sublesson-title-input sublesson-card-input"
-                  />
-                </div>
-                <div className="input-cnt add-sublesson-btn">
-                  <div
-                    className="sublesson-title-input center-media sublesson-card-input"
-                    onClick={() => window.open(sublesson?.link)}
-                  >
-                    <p className="sublesson-title-txt">open media</p>
-                  </div>
-                </div>
-                <div
-                  className="add-new-lesson-btn add-sublesson-btn edit-sublesson-btn"
-                //   onClick={() => setPopupOpen(false)}
-                >
-                  <div className="delete-btn">
-                    <img
-                      src={Trash}
-                      alt="delete"
-                      className="action-btn-img"
-                      onClick={() => handleRemoveSublesson(index)}
-                    />
-                  </div>
-                  <div className="delete-btn">
-                    <img
-                      src={Edit}
-                      alt="edit"
-                      className="action-btn-img"
-                      onClick={() => setEditSublesson(sublesson, index)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+          
         </div>
       </div>
     </div>
