@@ -1013,6 +1013,38 @@ cursor: pointer;
   border: none;
 }
 
+.lesson-popup-page{
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius:1.7rem;
+  width: 100%;
+  height: 100%;
+  background: #9b9a9a70;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: .2rem;
+}
+
+.lesson-popup{
+  width: 80%;
+  height: 100%;
+  background-color: #ffff;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+}
+.lesson-data-inputs-cnt{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.lesson-name-cnt{
+  width: 40%;
+}
+
 @media (min-width: 700px) {
   .course-list {
     justify-content: flex-start;
