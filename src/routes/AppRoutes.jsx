@@ -11,6 +11,8 @@ import Allusers from "../Admin/pages/userManagement/Allusers";
 import EditCourse from "../Admin/pages/courses/edit-course/EditCourse";
 import Login from "../Authentication/Login";
 import CourseDetails from "../Components/CourseDetails/CourseDetails";
+import AllTests from "../Admin/pages/tests/AllTests";
+import TestDetails from "../Admin/pages/tests/TestDetails";
 
 const AppRoutes = () => {
   return (
@@ -29,6 +31,8 @@ const AppRoutes = () => {
       <Route path="/admin/courses/new" element={<AddnewCourse />} />
       <Route path="/admin/courses/edit" element={<EditCourse />} />
       <Route path="/admin/users" element={< Allusers />} />
+      <Route path="/admin/tests" element={< AllTests />} />
+      <Route path="/admin/tests/details" element={< TestDetails />} />
     </Routes>
   );
 };

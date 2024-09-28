@@ -123,18 +123,18 @@ const AddTest = ({ testId, closeTest, addTest }) => {
   //   }
   // };
 
-  useEffect(() => {
-    if (duration?.hours !== 0 || duration?.minutes !== 0) {
-      const totalSeconds = duration?.hours * 60 * 60 + duration?.minutes * 60;
-      if (totalSeconds !== undefined) {
-        setCurrentTest((currentTest) => {
-          return { ...currentTest, timeLimit: totalSeconds };
-        });
+    useEffect(() => {
+      if (duration?.hours !== 0 || duration?.minutes !== 0) {
+        const totalSeconds = duration?.hours * 60 * 60 + duration?.minutes * 60;
+        if (totalSeconds !== undefined) {
+          setCurrentTest((currentTest) => {
+            return { ...currentTest, timeLimit: totalSeconds };
+          });
+        }
       }
-    }
-  }, [duration]);
+    }, [duration]);
 
-  console.log(currentTest);
+    console.log(currentTest);
 
   return (
     <div className="add-test-cnt">

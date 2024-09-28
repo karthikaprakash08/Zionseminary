@@ -25,6 +25,10 @@ const LeftBar = () => {
           {/* <FontAwesomeIcon icon={"faSignOutAlt"} className="icon" /> */}
           <span>Users</span>
         </Link>
+        <Link to="../admin/tests" className={`menu-item ${location === '/admin/tests' && 'menu-item-active'}`}>
+          {/* <FontAwesomeIcon icon={"faSignOutAlt"} className="icon" /> */}
+          <span>Tests</span>
+        </Link>
         <Link to="/" className="menu-item">
           {/* <FontAwesomeIcon icon={"faSignOutAlt"} className="icon" /> */}
           <span>Logout</span>
