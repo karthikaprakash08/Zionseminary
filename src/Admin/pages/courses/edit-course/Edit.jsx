@@ -69,17 +69,17 @@ const Edit = ({ courseDetails }) => {
   };
 
   const addLessontoCourse = (lesson) => {
-    console.log("lesson", lesson);
-    const newLessons = [...courseData.packages];
-    if (lesson?.updateIndex === null || lesson?.updateIndex === undefined) {
-      newLessons.push({
+    console.log(lesson)
+    const newCourse = [...courseData.courses];
+    if (lesson.updateIndex === null) {
+      newCourse.push({
         ...lesson,
-        updateIndex: newLessons?.length > 0 ? newLessons?.length : 0,
+        updateIndex: newCourse?.length > 0 ? newCourse?.length : 0,
       });
-      setCourseData({ ...courseData, packages: newLessons });
+      setCourseData({ ...courseData, courses: newCourse });
     } else {
-      newLessons[lesson.updateIndex] = lesson;
-      setCourseData({ ...courseData, packages: newLessons });
+      newCourse[lesson.updateIndex] = lesson;
+      setCourseData({ ...courseData, courses: newCourse });
     }
     setPopupOpen({ open: false });
   };
@@ -88,7 +88,7 @@ const Edit = ({ courseDetails }) => {
     if (
       courseData.domain &&
       // courseData.description &&
-      courseData.packages.length > 0
+      courseData.courses.length > 0
       // courseData.price
     ) {
       try {
@@ -125,12 +125,12 @@ const Edit = ({ courseDetails }) => {
     setCourseData({ ...courseData, overviewPoints: newOverviews });
   };
 
-  const handleRemoveLesson = (title) => {
-    const newLessonList = courseDetails.lessons?.filter(
-      (lesson) => lesson.title !== title
-    );
-    setCourseData({ ...courseData, lessons: newLessonList });
-  };
+  
+  const handleDeleteCourse = (courseIndex) => {
+    const newCourseData = [ ...courseData.courses]
+    newCourseData.splice(courseIndex, 1);
+    setCourseData({...courseData, courses: newCourseData });
+  }
 
   const openEditLesson = (lesson, index) => {
     lesson.updateIndex = index;
@@ -212,19 +212,6 @@ const Edit = ({ courseDetails }) => {
               onChange={(e) => handledirectInput("domain", e.target.value)}
             />
           </div>
-
-          <div className="course-description-cnt">
-            <p>Describe course</p>
-            <textarea
-              type="text"
-              name=""
-              id=""
-              className="description-input"
-              readOnly={editCourse ? false : true}
-              value={courseData.description}
-              onChange={(e) => handledirectInput("description", e.target.value)}
-            />
-          </div>
           <div className="flex-input">
             <div className="course-name-cnt responsive-input">
               <p>Enter course price</p>
@@ -266,8 +253,8 @@ const Edit = ({ courseDetails }) => {
             )}
           </div>
           <div className="lesson-list-cnt">
-            {courseData.packages?.length > 0 ? (
-              courseData?.packages?.map((lesson, index) => (
+            {courseData.courses?.length > 0 ? (
+              courseData?.courses?.map((lesson, index) => (
                 <div
                   className="lesson"
                   style={{ pointerEvents: editCourse ? "all" : "none" }}
@@ -278,7 +265,7 @@ const Edit = ({ courseDetails }) => {
                     <h3 className="lesson-title">{lesson?.name}</h3>
                   </div>
                   <ul className="lesson-subtitle-cnt">
-                    {lesson?.features?.map((feature) => (
+                    {lesson?.packages?.map((feature) => (
                       <li>
                         <p className="lesson-subtitle">{feature?.name}</p>
                         <p className="lesson-duration-txt">
@@ -303,10 +290,10 @@ const Edit = ({ courseDetails }) => {
       </div>
       {popupOpen.open && (
         <NewLesson
-          addLesson={(lesson) => addLessontoCourse(lesson)}
+          addCourse={(course) => addLessontoCourse(course)}
           editData={popupOpen?.data}
           cancel={() => setPopupOpen({ open: false, data: null })}
-          removeThisLesson={(Id) => handleRemoveLesson(Id)}
+          removeThisCourse={(index) => handleDeleteCourse(index)}
         />
       )}
     </div>

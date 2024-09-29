@@ -1,29 +1,12 @@
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom';
 
-const TestDetails = ({ testId, closeTest, addTest }) => {
-    const initialMCQState = {
-        question: "",
-        correctAnswer: null,
-        options: [],
-        questionNumber: null,
-        updateIndex: null,
-    };
-    const initialState = {
-        question: "",
-        questionNumber: null,
-        updateIndex: null,
-    };
+const TestDetails = ({ testId, closeTest }) => {
 
-    const [currentTest, setCurrentTest] = useState({
-        title: "testing Exam",
-        timeLimit: 11,
-        questions: [],
-    });
+    const testData = useLocation()?.state
 
-    const [currentQuestion, setCurrentQuestion] = useState(initialMCQState);
-    const [dropDown, setDropDown] = useState(false);
-    const [duration, setDuration] = useState({ hours: 0, minutes: 0 });
-    const [currentTestType, setCurrentTestType] = useState('Para')
+    const [currentTest, setCurrentTest] = useState(testData);
+    const [currentQuestion, setCurrentQuestion] = useState(testData?.questions[0] || []);
 
     useEffect(() => {
         const getTest = async () => {
@@ -37,28 +20,6 @@ const TestDetails = ({ testId, closeTest, addTest }) => {
         getTest();
     }, [testId]);
 
-    useEffect(() => {
-        if (currentTestType === 'MCQ') {
-            setCurrentQuestion(initialMCQState)
-        }
-        if (currentTestType === 'paragraph') {
-
-        }
-    }, [currentTestType]);
-
-    const handleChoiceSelect = (index, value) => {
-        setDropDown(false);
-        setCurrentQuestion({
-            ...currentQuestion,
-            correctAnswer: currentQuestion?.options[index],
-        });
-    };
-
-    const handleChoiceInput = (index, value) => {
-        const newChoices = [...currentQuestion.options];
-        newChoices[index] = value;
-        setCurrentQuestion({ ...currentQuestion, options: newChoices });
-    };
 
     const handleNext = () => {
         const updatedtest = [...currentTest.questions];
@@ -101,16 +62,16 @@ const TestDetails = ({ testId, closeTest, addTest }) => {
         return false;
     };
 
-    useEffect(() => {
-        if (duration?.hours !== 0 || duration?.minutes !== 0) {
-            const totalSeconds = duration?.hours * 60 * 60 + duration?.minutes * 60;
-            if (totalSeconds !== undefined) {
-                setCurrentTest((currentTest) => {
-                    return { ...currentTest, timeLimit: totalSeconds };
-                });
-            }
-        }
-    }, [duration]);
+    // useEffect(() => {
+    //     if (duration?.hours !== 0 || duration?.minutes !== 0) {
+    //         const totalSeconds = duration?.hours * 60 * 60 + duration?.minutes * 60;
+    //         if (totalSeconds !== undefined) {
+    //             setCurrentTest((currentTest) => {
+    //                 return { ...currentTest, timeLimit: totalSeconds };
+    //             });
+    //         }
+    //     }
+    // }, [duration]);
 
     console.log(currentTest);
     return (
@@ -120,15 +81,15 @@ const TestDetails = ({ testId, closeTest, addTest }) => {
                     <div className="test-name-cnt">
                         <div className='test-info-flex'>
                             <p className='test-info-label'>Course Title</p>
-                            <p className='test-info-value'> : Static Course </p>
+                            <p className='test-info-value'> : {currentTest?.course}</p>
                         </div>
                         <div className='test-info-flex'>
                             <p className='test-info-label'>Student Name</p>
-                            <p className='test-info-value'>  : Shibu </p>
+                            <p className='test-info-value'>  : {currentTest?.studentName} </p>
                         </div>
                         <div className='test-info-flex'>
                             <p className='test-info-label'>Student ID</p>
-                            <p className='test-info-value'>  : ahjadjha737573jd </p>
+                            <p className='test-info-value'>  : {currentTest?.studentId} </p>
                         </div>
                     </div>
                 </div>
@@ -149,11 +110,11 @@ const TestDetails = ({ testId, closeTest, addTest }) => {
                 <div className="test-name-cnt">
                     <div className='test-info-flex'>
                         <p className='test-info-label'>Time</p>
-                        <p className='test-info-value' style={{ color: "orange", fontSize: "1rem" }}> : 120 minutes</p>
+                        <p className='test-info-value' style={{ color: "orange", fontSize: "1rem" }}> :{currentTest?.timeline}</p>
                     </div>
                     <div className='test-info-flex'>
                         <p className='test-info-label'>finished in</p>
-                        <p className='test-info-value' style={{ color: "green", fontSize: "1rem" }}>  : 80 minutes </p>
+                        <p className='test-info-value' style={{ color: "green", fontSize: "1rem" }}>  : {currentTest?.finishTime}</p>
                     </div>
                 </div>
             </div>
@@ -164,14 +125,13 @@ const TestDetails = ({ testId, closeTest, addTest }) => {
                         style={{ background: checkquestionMatch(index) }}
                         key={index}
                         onClick={() => setCurrentQuestion({ ...test, updateIndex: index })}
+                    ><p
+                        key={index}
+                        className="question-number"
+                        style={{
+                            color: checkquestionMatch(index) === "transparent" && "#8949ff",
+                        }}
                     >
-                        <p
-                            key={index}
-                            className="question-number"
-                            style={{
-                                color: checkquestionMatch(index) === "transparent" && "#8949ff",
-                            }}
-                        >
                             {index + 1}
                         </p>
                     </div>
@@ -193,7 +153,7 @@ const TestDetails = ({ testId, closeTest, addTest }) => {
                 </div>
             </div>
             <div className="question-inputs-cnt">
-                <div className={`question-input-cnt ${currentTestType !== 'MCQ' && 'pargaraph-question'}`}>
+                <div className={`question-input-cnt ${currentQuestion?.type !== 'MCQ' && 'pargaraph-question'}`}>
                     <p>Question</p>
                     <textarea
                         className="question-input"
@@ -207,7 +167,7 @@ const TestDetails = ({ testId, closeTest, addTest }) => {
                     />
                 </div>
                 {
-                    currentTestType === 'MCQ' && (<div className="choice-cnt">
+                    currentQuestion?.type !== 'MCQ' && (<div className="choice-cnt">
                         <div className="choice-header">
                             <p>Answers</p>
                             <div className='test-mark-input-cnt'>

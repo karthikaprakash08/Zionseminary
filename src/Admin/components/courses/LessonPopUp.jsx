@@ -4,8 +4,10 @@ import { findFileType } from '../../hooks/newCourseFunctions';
 import Test from "../../assets/Images/exam.png";
 import Trash from "../../assets/Images/trash.png";
 import Edit from "../../assets/Images/edit.png";
+import LoadingGif from "../../assets/gif/loading.gif";
 import Upload from "../../assets/Images/upload.png";
 import { uploadFile } from '../../firebase/lessonApi';
+import LessonTest from './LessonTest';
 
 
 const initialState = {
@@ -14,6 +16,7 @@ const initialState = {
   link: "",
   updateIndex: null,
   type: null,
+  testId: null,
 }
 
 
@@ -22,11 +25,11 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
     name: null,
     features: [],
     updateIndex: null,
-    testId: null
   });
   const [currentSublesson, setCurrentSublesson] = useState(initialState);
   const [currentUpdateIndex, setCurrentUpdateIndex] = useState(null)
   const [uploadingFile, setUploadingFile] = useState(false)
+  const [openLessonTest, setOpenLessonTest] = useState(false)
 
   const handleAddFile = async (file) => {
     setUploadingFile(true)
@@ -34,7 +37,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
     console.log("filetype", filetype);
     const link = await uploadFile(file, filetype)
     console.log("link", link);
-    setCurrentSublesson({ ...currentSublesson, link: link,type: filetype });
+    setCurrentSublesson({ ...currentSublesson, link: link, type: filetype });
     setUploadingFile(false)
   };
 
@@ -74,6 +77,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
   const validateAndUpdateLesson = () => {
     if (currentLesson.name && currentLesson.features.length > 0) {
       addLesson(currentLesson);
+      cancel()
     }
   };
 
@@ -95,7 +99,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
     );
     console.log(editData?.title);
     if (confirm) {
-      removeThisLesson(editData?.name);
+      removeThisLesson(editData?.updateIndex);
       cancel();
     }
   };
@@ -108,6 +112,14 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
 
   return (
     <div className='lesson-popup-page'>
+      {
+        openLessonTest && (
+          <LessonTest
+            closeTest={() => setOpenLessonTest(false)}
+            addTest={(testId) => setCurrentSublesson({ ...currentSublesson, testId: testId })}
+            testId={currentSublesson.testId}
+          />)
+      }
       <div className='lesson-popup'>
         <div className="form-right-header">
           <div className="back-btn" onClick={() => cancel()}>
@@ -117,14 +129,14 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
             {editData && (
               <div
                 className="add-new-lesson-btn cancel-btn"
-              onClick={() => handleDelete()}
+                onClick={() => handleDelete()}
               >
-                Delete Course
+                Delete Lesson
               </div>
             )}
             <div
               className="add-new-lesson-btn"
-            onClick={() => validateAndUpdateLesson()}
+              onClick={() => validateAndUpdateLesson()}
             >
               Add to Course
             </div>
@@ -139,7 +151,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
               id=""
               value={currentLesson.name}
               className="sublesson-title-input"
-            onChange={(e) => setCurrentLesson({ ...currentLesson, name: e.target.value })}
+              onChange={(e) => setCurrentLesson({ ...currentLesson, name: e.target.value })}
             />
           </div>
           <div className="lesson-content-input-cnt">
@@ -151,7 +163,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                 id=""
                 value={currentSublesson.name}
                 className="sublesson-title-input"
-              onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
+                onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
               />
             </div>
             <div className="sublesson-content-cover">
@@ -162,18 +174,17 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                   name=""
                   id=""
                   className="sublesson-duration-input sublesson-title-input "
-                value={currentSublesson.duration}
-                onChange={(e) =>
-                  handleSubLessonsInput("duration", e.target.value)
-                }
+                  value={currentSublesson.duration}
+                  onChange={(e) =>
+                    handleSubLessonsInput("duration", e.target.value)
+                  }
                 />
               </div>
               <div className="input-cnt add-sublesson-btn flex-input">
-                <div className="sublesson-title-input center-media">
-                  <img src={Upload} alt="imag" className='test-icon' />
-                  {/* {currentSublesson.link.length > 5 && !uploadingFile && (<p>media uploaded</p>)}
-                  {currentSublesson.link.length < 5 && !uploadingFile && (<p> upload media</p>)}
-                  {uploadingFile && (<p>uploading..</p>)} */}
+                <div className="sublesson-title-input center-media" style={{ opacity: currentSublesson.testId && '0.5', pointerEvents: currentSublesson.testId && 'none' }}>
+
+                  {currentSublesson.link.length > 5 && !uploadingFile && (<p>{currentSublesson.type}</p>)}
+                  {currentSublesson.link.length < 5 && (<img src={!uploadingFile ? Upload : LoadingGif} alt="imag" className={`${!uploadingFile ? 'test-icon' : 'gif-icon'}`} />)}
                   <input
                     type="file"
                     name="video-upload"
@@ -181,19 +192,16 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                     style={{ position: "absolute" }}
                     id=""
                     className="file-title-input"
-                  onChange={(e) => handleAddFile(e.target.files[0])}
+                    onChange={(e) => handleAddFile(e.target.files[0])}
                   />
                 </div>
-                <div className="sublesson-title-input center-media">
+                <div className="sublesson-title-input center-media" style={{ cursor: 'pointer', opacity: currentSublesson.type && '0.5', pointerEvents: currentSublesson?.type && 'none', }} onClick={() => setOpenLessonTest(true)}>
                   <img src={Test} alt="imag" className='test-icon' />
-                  {/* {currentSublesson.link.length > 5 && !uploadingFile && (<p>media uploaded</p>)}
-                  {currentSublesson.link.length < 5 && !uploadingFile && (<p> upload media</p>)}
-                  {uploadingFile && (<p>uploading..</p>)} */}
                 </div>
               </div>
               <div
                 className="add-new-lesson-btn add-sublesson-btn"
-              onClick={() => addSublessons()}
+                onClick={() => addSublessons()}
               >
                 {currentUpdateIndex !== null ? 'Update' : 'Add'}
               </div>

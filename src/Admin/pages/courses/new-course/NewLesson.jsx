@@ -20,14 +20,22 @@ const initialState = {
   testId: null,
 }
 
-const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
+const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
   const [currentCourse, setCurrentCourse] = useState(initialState)
   const [openTest, setOpenTest] = useState({ open: false, data: null })
   const [isfold, setFold] = useState(null)
   const [openLessonPopUP, setOPenLessonPopUP] = useState({ open: false, data: null })
 
   const addLessonToCourse = (lesson) => {
-    setCurrentCourse({ ...currentCourse, packages: [...currentCourse.packages, lesson] })
+    console.log(lesson)
+    if(lesson?.updateIndex !== null){
+      console.log(lesson.updateIndex)
+      let updatedPackage = [...currentCourse.packages]
+      updatedPackage[lesson.updateIndex] = lesson
+      setCurrentCourse({...currentCourse,packages: updatedPackage})
+    }else{
+      setCurrentCourse({ ...currentCourse, packages: [...currentCourse.packages, lesson] })
+    }
   }
 
   const getFiletypeImg = (filetype) => {
@@ -35,6 +43,34 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
     if (filetype === 'test') return Test
     return Doc
   }
+
+  const validateAndUpdateCourse = () => {
+    if (currentCourse.description.length > 5 && currentCourse.name && currentCourse.packages.length > 0) {
+      addCourse(currentCourse)
+      cancel()
+    }
+  }
+
+  useEffect(() => {
+    if (editData) setCurrentCourse(editData)
+  }, [editData])
+
+  const handleRemoveLessonFromCourse = (lessonIndex) => {
+    const newPackages = [...currentCourse.packages];
+    newPackages.splice(lessonIndex, 1);
+    setCurrentCourse({...currentCourse, packages: newPackages });
+  }
+
+  const handleDelete = () => {
+    const confirm = window.confirm(
+      "Confirm to delete this course, all lessons will be deleted"
+    );
+    console.log(editData?.title);
+    if (confirm) {
+      removeThisCourse(editData?.updateIndex);
+      cancel();
+    }
+  };
 
   console.log(currentCourse)
 
@@ -45,7 +81,8 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
           openLessonPopUP.open && (
             <LessonPopUp
               addLesson={(lesson) => addLessonToCourse(lesson)}
-              // removeThisLesson={}
+              editData={openLessonPopUP.data}
+              removeThisLesson={(lessonIndex)=> handleRemoveLessonFromCourse(lessonIndex)}
               cancel={() => setOPenLessonPopUP({ open: false, data: null })}
             />
           )
@@ -54,7 +91,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
           <AddTest
             testId={currentCourse?.testId}
             addTest={(data) => {
-              setCurrentLesson({ ...currentCourse, testId: data });
+              setCurrentCourse({ ...currentCourse, testId: data });
             }}
             closeTest={() => setOpenTest({ open: false })}
           />
@@ -74,7 +111,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
             )}
             <div
               className="add-new-lesson-btn"
-              onClick={() => validateAndUpdateLesson()}
+              onClick={() => validateAndUpdateCourse()}
             >
               Add to Degree
             </div>
@@ -88,12 +125,10 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
             <p >Course Title</p>
             <input
               type="text"
-              name=""
-              id=""
-              value={currentCourse.name}
+              value={currentCourse?.name}
               className="lesson-title-input"
               onChange={(e) =>
-                setCurrentLesson({
+                setCurrentCourse({
                   ...currentCourse,
                   name: e.target.value,
                 })
@@ -121,10 +156,10 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
                 type="text"
                 name=""
                 id=""
-                style={{height:'4.5rem'}}
-                // value={currentSublesson.name}
+                style={{ height: '4.5rem' }}
+                value={currentCourse.description}
                 className="sublesson-title-input"
-              // onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
+                onChange={(e) => setCurrentCourse({ ...currentCourse, description: e.target.value })}
               />
             </div>
             <div className="add-newLesson-btn" onClick={() => setOPenLessonPopUP({ open: true, data: null })}>
@@ -143,11 +178,11 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
               >
                 <div className="lesson-list-name-cnt">
                   <div className="lesson-edit-delete-cnt">
-                    <img src={ArrowRight} alt="arrow" style={{rotate:isfold === index ? '90deg': '0deg'}} className="edit-img"/>
-                  <p>{lesson.name}</p>
+                    <img src={ArrowRight} alt="arrow" style={{ rotate: isfold === index ? '90deg' : '0deg' }} className="edit-img" />
+                    <p>{lesson.name}</p>
                   </div>
                   <div className="lesson-edit-delete-cnt">
-                    <img src={Edit} alt="edit" className="edit-img" onClick={() => setOPenLessonPopUP({ open: true, data: lesson })} />
+                    <img src={Edit} alt="edit" className="edit-img" onClick={() => setOPenLessonPopUP({ open: true, data: {...lesson,updateIndex:index} })} />
                     <img
                       src={Trash}
                       alt="trash"

@@ -1121,6 +1121,12 @@ input[type="file"]::file-selector-button:active {
   object-fit: contain;
 }
 
+.gif-icon{
+  width: 2rem;
+  height: 2rem;
+  object-fit: cover;
+}
+
 @media (min-width: 700px) {
   .course-list {
     justify-content: flex-start;

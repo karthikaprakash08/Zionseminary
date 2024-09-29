@@ -3,19 +3,19 @@ import './ToggleBtn.css';
 
 const ToggleBtn = ({ leftValue, RightValue, currentValue, handleToggle }) => {
   const handleToggleChange = () => {
-    if (currentValue === leftValue) {
+    console.log(currentValue)
+    if (currentValue.type === leftValue.type) {
       handleToggle(RightValue);
-    } else if (currentValue === RightValue) {
+    } else if (currentValue.type === RightValue.type) {
       handleToggle(leftValue);
     }
   };
-
   return (
-    <div className="toggle-btn" onClick={handleToggleChange}>
+    <div className="toggle-btn" onClick={()=>handleToggleChange()}>
       <div
         className="btn-circle"
         style={{
-          transform: `translateX(${currentValue === leftValue ? '0.25rem' : '2.15rem'})`,
+          transform: `translateX(${currentValue.type === leftValue.type ? '0.25rem' : '2.15rem'})`,
         }}
       />
     </div>

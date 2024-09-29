@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { convertToUTC } from "../../../hooks/newCourseFunctions";
 import ToggleBtn from "../../../components/Test/ToggleBtn";
+import { addNewTest, getTestById, updateTest } from "../../../firebase/testApi";
 
 const AddTest = ({ testId, closeTest, addTest }) => {
   const initialMCQState = {
@@ -9,44 +10,48 @@ const AddTest = ({ testId, closeTest, addTest }) => {
     options: [],
     questionNumber: null,
     updateIndex: null,
+    type: 'MCQ',
   };
-  const initialState = {
+  const initialParagraphState = {
     question: "",
     questionNumber: null,
     updateIndex: null,
+    type: 'Paragraph',
   };
 
   const [currentTest, setCurrentTest] = useState({
     title: "testing Exam",
     timeLimit: 11,
     questions: [],
+    target:'course'
   });
 
   const [currentQuestion, setCurrentQuestion] = useState(initialMCQState);
   const [dropDown, setDropDown] = useState(false);
   const [duration, setDuration] = useState({ hours: 0, minutes: 0 });
-  const [currentTestType, setCurrentTestType] = useState('MCQ')
+  // const [currentTestType, setCurrentTestType] = useState('MCQ')
 
   useEffect(() => {
     const getTest = async () => {
       if (testId?.length > 1) {
-        // const { data } = await getLessonTest(testId);
-        // setCurrentTest(data?.test);
-        // const time = convertToUTC(data?.test?.timeLimit);
-        // setDuration(time);
+        const data  = await getTestById(testId);
+        setCurrentTest(data);
+        const time = convertToUTC(data?.test?.timeLimit);
+        setDuration(time);
       }
     };
     getTest();
   }, [testId]);
 
-  useEffect(() => {
-    if (currentTestType === 'MCQ') {
-      setCurrentQuestion(initialMCQState)
-    }
-    if (currentTestType === 'paragraph') {
-
-    }
-  }, [currentTestType]);
+  // useEffect(() => {
+  //   console.log(currentTestType)
+  //   if (currentTestType === 'MCQ') {
+  //     setCurrentQuestion(initialMCQState)
+  //   }
+  //   if (currentTestType === 'Paragraph') {
+  //     setCurrentQuestion(initialParagraphState)
+  //   }
+  // }, [currentTestType]);
 
   const handleChoiceSelect = (index, value) => {
     setDropDown(false);
@@ -93,6 +98,11 @@ const AddTest = ({ testId, closeTest, addTest }) => {
     return "transparent";
   };
 
+  const handleSelectQuestion = (index, test) => {
+    setCurrentQuestion({ ...test, updateIndex: index })
+    // setCurrentTestType(test?.type)
+  }
+
   const questionValidation = () => {
     if (
       currentQuestion?.question?.length > 5 &&
@@ -100,41 +110,42 @@ const AddTest = ({ testId, closeTest, addTest }) => {
       currentQuestion?.options?.length === 4
     )
       return true;
+    if (currentQuestion.type === 'Paragraph' && currentQuestion?.question?.length > 5) return true
     return false;
   };
 
-  // const handleAddTest = async () => {
-  //   if (testId?.length > 5) {
-  //     try {
-  //       const { data } = await updateTest(currentTest);
-  //       addTest(data?.test?._id);
-  //       closeTest();
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   } else {
-  //     try {
-  //       const { data } = await addnewTest(currentTest);
-  //       addTest(data?.test?._id);
-  //       closeTest();
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  // };
-
-    useEffect(() => {
-      if (duration?.hours !== 0 || duration?.minutes !== 0) {
-        const totalSeconds = duration?.hours * 60 * 60 + duration?.minutes * 60;
-        if (totalSeconds !== undefined) {
-          setCurrentTest((currentTest) => {
-            return { ...currentTest, timeLimit: totalSeconds };
-          });
-        }
+  const handleAddTest = async () => {
+    if (testId?.length > 5) {
+      try {
+        const data  = await updateTest(currentTest);
+        addTest(data);
+        closeTest();
+      } catch (error) {
+        console.log(error);
       }
-    }, [duration]);
+    } else {
+      try {
+        const data  = await addNewTest(currentTest);
+        addTest(data);
+        closeTest();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
-    console.log(currentTest);
+  useEffect(() => {
+    if (duration?.hours !== 0 || duration?.minutes !== 0) {
+      const totalSeconds = duration?.hours * 60 * 60 + duration?.minutes * 60;
+      if (totalSeconds !== undefined) {
+        setCurrentTest((currentTest) => {
+          return { ...currentTest, timeLimit: totalSeconds };
+        });
+      }
+    }
+  }, [duration]);
+
+  console.log(currentTest);
 
   return (
     <div className="add-test-cnt">
@@ -162,12 +173,13 @@ const AddTest = ({ testId, closeTest, addTest }) => {
           <div className="toggle-btn-cnt">
             <p>MCQ</p>
             <ToggleBtn
-              leftValue={'MCQ'}
-              RightValue={'Para'}
-              currentValue={currentTestType}
-              handleToggle={(value) => setCurrentTestType(value)}
+              leftValue={initialMCQState}
+              RightValue={initialParagraphState}
+              currentValue={currentQuestion}
+              // currentValue={currentTestType}
+              handleToggle={(value) => setCurrentQuestion(value)}
             />
-            <p>Parag</p>
+            <p>Paragraph</p>
           </div>
         </div>
         <div className="duration-input-cnt ">
@@ -206,7 +218,7 @@ const AddTest = ({ testId, closeTest, addTest }) => {
             className="question-block"
             style={{ background: checkquestionMatch(index) }}
             key={index}
-            onClick={() => setCurrentQuestion({ ...test, updateIndex: index })}
+            onClick={() => handleSelectQuestion(index, test)}
           >
             <p
               key={index}
@@ -237,7 +249,7 @@ const AddTest = ({ testId, closeTest, addTest }) => {
         </div>
       </div>
       <div className="question-inputs-cnt">
-        <div className={`question-input-cnt ${currentTestType !== 'MCQ' && 'pargaraph-question'}`}>
+        <div className={`question-input-cnt ${currentQuestion?.type  !== 'MCQ' && 'pargaraph-question'}`}>
           <p>Question</p>
           <textarea
             className="question-input"
@@ -251,7 +263,7 @@ const AddTest = ({ testId, closeTest, addTest }) => {
           />
         </div>
         {
-          currentTestType === 'MCQ' && (<div className="choice-cnt">
+          currentQuestion?.type === 'MCQ' && (<div className="choice-cnt">
             <div className="choice-header">
               <p>Choices</p>
               <div className="select-answer-cnt">

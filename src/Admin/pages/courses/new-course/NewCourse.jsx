@@ -25,7 +25,7 @@ const NewCourse = () => {
     price: null,
     thumbnail: null,
     overviewPoints: [],
-    packages: [],
+    courses: [],
   });
 
   useEffect(() => {
@@ -36,19 +36,24 @@ const NewCourse = () => {
     setCourseData({ ...courseData, [type]: value });
   };
   
+  const handleDeleteCourse = (courseIndex) => {
+    const newCourseData = [ ...courseData.courses]
+    newCourseData.splice(courseIndex, 1);
+    setCourseData({...courseData, courses: newCourseData });
+  }
 
   const addLessontoCourse = (lesson) => {
     console.log(lesson)
-    const newPackages = [...courseData.packages];
+    const newCourse = [...courseData.courses];
     if (lesson.updateIndex === null) {
-      newPackages.push({
+      newCourse.push({
         ...lesson,
-        updateIndex: newPackages?.length > 0 ? newPackages?.length : 0,
+        updateIndex: newCourse?.length > 0 ? newCourse?.length : 0,
       });
-      setCourseData({ ...courseData, packages: newPackages });
+      setCourseData({ ...courseData, courses: newCourse });
     } else {
-      newPackages[lesson.updateIndex] = lesson;
-      setCourseData({ ...courseData, packages: newPackages });
+      newCourse[lesson.updateIndex] = lesson;
+      setCourseData({ ...courseData, courses: newCourse });
     }
     setPopupOpen({ open: false });
   };
@@ -57,7 +62,7 @@ const NewCourse = () => {
     if (
       courseData.domain &&
       // courseData.description &&
-      courseData.packages.length > 0 &&
+      courseData.courses.length > 0 &&
       courseData.price
     ) {
       // const courseFormData = convertToCourseFormData(courseData)
@@ -107,7 +112,7 @@ const NewCourse = () => {
             />
           </div>
 
-          <div className="course-description-cnt">
+          {/* <div className="course-description-cnt">
             <p>Describe degree</p>
             <textarea
               type="text"
@@ -117,7 +122,7 @@ const NewCourse = () => {
               className="description-input"
               onChange={(e) => handledirectInput("description", e.target.value)}
             />
-          </div>
+          </div> */}
           <div className="flex-input">
             <div className="course-name-cnt">
               <p>Enter degree price</p>
@@ -156,8 +161,8 @@ const NewCourse = () => {
           </div>
 
           <div className="lesson-list-cnt">
-            {courseData.packages?.length > 0 ? (
-              courseData?.packages?.map((lesson, index) => (
+            {courseData.courses?.length > 0 ? (
+              courseData?.courses?.map((lesson, index) => (
                 <div
                   className="lesson"
                   onClick={() => setPopupOpen({ open: true, data: lesson })}
@@ -167,12 +172,9 @@ const NewCourse = () => {
                     <h3 className="lesson-title">{lesson?.name}</h3>
                   </div>
                   <ul className="lesson-subtitle-cnt">
-                    {lesson?.features?.map((sublesson) => (
+                    {lesson?.packages?.map((sublesson) => (
                       <li>
                         <p className="lesson-subtitle">{sublesson?.name}</p>
-                        <p className="lesson-duration-txt">
-                          duration : {sublesson?.duration}
-                        </p>
                       </li>
                     ))}
                   </ul>
@@ -193,13 +195,10 @@ const NewCourse = () => {
       </div>
       {popupOpen.open && (
         <NewLesson
-          addLesson={(lesson) => addLessontoCourse(lesson)}
+          addCourse={(course) => addLessontoCourse(course)}
           editData={popupOpen?.data}
           cancel={() => setPopupOpen({ open: false, data: null })}
-          removeThisLesson={(courseName) => setCourseData((prevData) => {
-            prevData.packages = prevData.packages.filter((obj) => obj.name !== courseName)
-            return prevData
-          })}
+          removeThisCourse={(index) => handleDeleteCourse(index)}
         />
       )}
     </div>
