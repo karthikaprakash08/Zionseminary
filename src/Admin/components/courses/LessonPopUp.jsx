@@ -5,6 +5,7 @@ import Test from "../../assets/Images/exam.png";
 import Trash from "../../assets/Images/trash.png";
 import Edit from "../../assets/Images/edit.png";
 import Upload from "../../assets/Images/upload.png";
+import { uploadFile } from '../../firebase/lessonApi';
 
 
 const initialState = {
@@ -31,9 +32,9 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
     setUploadingFile(true)
     const filetype = findFileType(file);
     console.log("filetype", filetype);
-    const link = await uploadingFile(file, filetype)
+    const link = await uploadFile(file, filetype)
     console.log("link", link);
-    setCurrentSublesson({ ...currentSublesson, link: link });
+    setCurrentSublesson({ ...currentSublesson, link: link,type: filetype });
     setUploadingFile(false)
   };
 
@@ -136,9 +137,9 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
               type="text"
               name=""
               id=""
-              value={currentSublesson.name}
+              value={currentLesson.name}
               className="sublesson-title-input"
-            onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
+            onChange={(e) => setCurrentLesson({ ...currentLesson, name: e.target.value })}
             />
           </div>
           <div className="lesson-content-input-cnt">

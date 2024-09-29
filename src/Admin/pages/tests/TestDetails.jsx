@@ -211,8 +211,8 @@ const TestDetails = ({ testId, closeTest, addTest }) => {
                         <div className="choice-header">
                             <p>Answers</p>
                             <div className='test-mark-input-cnt'>
-                            <p>Marks :</p>
-                            <input type='number' className='test-mark-input' placeholder='Mark'/>
+                                <p>Marks :</p>
+                                <input type='number' className='test-mark-input' placeholder='Mark' />
                             </div>
                         </div>
                         <div className="choice">

@@ -2,32 +2,51 @@ import React, { useEffect, useState } from "react";
 import Trash from "../../../assets/Images/trash.png";
 import Edit from "../../../assets/Images/edit.png";
 import Test from "../../../assets/Images/exam.png";
+import Video from "../../../assets/Images/video-files.png";
+import Doc from "../../../assets/Images/papers.png";
+import ArrowRight from "../../../assets/Images/arrow-right.png";
 
 // import { uploadDocument, uploadVedio } from "../../../api/baseApi";
 import BackIcon from "../../../assets/Images/left-arrow.png";
 import AddTest from "./AddTest";
 import LessonPopUp from "../../../components/courses/LessonPopUp";
 
+
 const initialState = {
   name: "",
   description: "",
-  packages:[],
+  packages: [],
   updateIndex: null,
   testId: null,
 }
 
 const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
-  const [currentCourse,setCurrentCourse] = useState(initialState)
+  const [currentCourse, setCurrentCourse] = useState(initialState)
   const [openTest, setOpenTest] = useState({ open: false, data: null })
+  const [isfold, setFold] = useState(null)
   const [openLessonPopUP, setOPenLessonPopUP] = useState({ open: false, data: null })
+
+  const addLessonToCourse = (lesson) => {
+    setCurrentCourse({ ...currentCourse, packages: [...currentCourse.packages, lesson] })
+  }
+
+  const getFiletypeImg = (filetype) => {
+    if (filetype === 'video') return Video
+    if (filetype === 'test') return Test
+    return Doc
+  }
+
+  console.log(currentCourse)
 
   return (
     <div className="lesson-popup-cnt">
       <div className="lesson-new-cnt">
         {
           openLessonPopUP.open && (
-            <LessonPopUp 
-            cancel={()=>setOPenLessonPopUP({open:false, data: null})}
+            <LessonPopUp
+              addLesson={(lesson) => addLessonToCourse(lesson)}
+              // removeThisLesson={}
+              cancel={() => setOPenLessonPopUP({ open: false, data: null })}
             />
           )
         }
@@ -102,6 +121,7 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
                 type="text"
                 name=""
                 id=""
+                style={{height:'4.5rem'}}
                 // value={currentSublesson.name}
                 className="sublesson-title-input"
               // onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
@@ -113,7 +133,45 @@ const NewLesson = ({ addLesson, cancel, editData, removeThisLesson }) => {
           </div>
         </div>
         <div className="content-list">
-          
+          {
+            currentCourse?.packages?.length > 0 &&
+            currentCourse?.packages?.map((lesson, index) => (
+              <div
+                className="lesson-list-item-cnt"
+                key={index}
+                onClick={() => setFold(isfold !== index ? index : null)}
+              >
+                <div className="lesson-list-name-cnt">
+                  <div className="lesson-edit-delete-cnt">
+                    <img src={ArrowRight} alt="arrow" style={{rotate:isfold === index ? '90deg': '0deg'}} className="edit-img"/>
+                  <p>{lesson.name}</p>
+                  </div>
+                  <div className="lesson-edit-delete-cnt">
+                    <img src={Edit} alt="edit" className="edit-img" onClick={() => setOPenLessonPopUP({ open: true, data: lesson })} />
+                    <img
+                      src={Trash}
+                      alt="trash"
+                      className="trash-img"
+                      onClick={() => removeThisLesson(index)}
+                    />
+                  </div>
+                </div>
+                <div className="lesson-features-list" style={{ maxHeight: isfold === index ? '5rem' : 0 }}>
+                  {
+                    lesson.features?.map((sublesson, subIndex) => (
+                      <div className="features-cnt">
+                        <div className="lesson-edit-delete-cnt">
+                          <img src={getFiletypeImg(sublesson.type)} alt="fileType" className="icon-image-small" />
+                          <p>{sublesson.name}</p>
+                        </div>
+                        <p>{sublesson.duration}</p>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+            ))
+          }
         </div>
       </div>
     </div>
