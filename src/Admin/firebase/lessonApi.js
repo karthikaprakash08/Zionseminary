@@ -10,8 +10,9 @@ export const uploadFile = async (file, type) => {
   try {
     if (type === 'video') {
       fileURL = await uploadToVimeo(file);
-    } else if (type === 'document' || type === 'pdf' || type === 'ppt') {
-      const fileRef = ref(storage, `documents/${uuidv4()}_${file.name}`);
+    } else if (type === 'image' || type === 'document' || type === 'pdf' || type === 'ppt') {
+      //const fileRef = ref(storage, `documents/${uuidv4()}_${file.name}`);
+      const fileRef = ref(storage, `${type}s/${uuidv4()}_${file.name}`);
       await uploadBytes(fileRef, file);  // Upload file to Firebase
       fileURL = await getDownloadURL(fileRef); 
       console.log('File uploaded to Firebase Storage, URL:', fileURL);
@@ -23,15 +24,25 @@ export const uploadFile = async (file, type) => {
   }
 };
 
+
 // Add Degree with courses
 export const addDegree = async (degreeData) => {
   try {
     const degreeId = uuidv4(); 
-    const courses = degreeData.courses.map(course => ({
-      ...course,
+    const courses = await Promise.all(degreeData.courses.map(async (course) => {
+      let thumbnailUrl = '';
+      if (course.thumbnail) {
+        thumbnailUrl = await uploadFile(course.thumbnail, 'image');  // Upload  thumbnail
+      }
+    //const courses = degreeData.courses.map(course => ({
+    //  ...course,
+    return {
       courseId: uuidv4(),
+      name: course.name,
+      thumbnail: thumbnailUrl,
       createdAt: Date.now(),
-    }));
+    };
+  }));
 
     await addDoc(collection(db, 'degrees'), {
       degreeId,
