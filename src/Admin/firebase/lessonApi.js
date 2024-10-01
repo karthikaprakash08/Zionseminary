@@ -36,6 +36,7 @@ export const addDegree = async (degreeData) => {
     await addDoc(collection(db, 'degrees'), {
       degreeId,
       name: degreeData.name,
+      price: degreeData.price,
       courses,
       createdAt: Date.now(),
     });
