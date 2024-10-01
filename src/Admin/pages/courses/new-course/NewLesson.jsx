@@ -15,7 +15,7 @@ import LessonPopUp from "../../../components/courses/LessonPopUp";
 const initialState = {
   name: "",
   description: "",
-  packages: [],
+  lessons: [],
   updateIndex: null,
   testId: null,
 }
@@ -27,14 +27,15 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
   const [openLessonPopUP, setOPenLessonPopUP] = useState({ open: false, data: null })
 
   const addLessonToCourse = (lesson) => {
-    console.log(lesson)
+    console.log(lesson,"here")
     if(lesson?.updateIndex !== null){
       console.log(lesson.updateIndex)
-      let updatedPackage = [...currentCourse.packages]
-      updatedPackage[lesson.updateIndex] = lesson
-      setCurrentCourse({...currentCourse,packages: updatedPackage})
+      let updatedLesson = [...currentCourse.lessons]
+      updatedLesson[lesson.updateIndex] = lesson
+      setCurrentCourse({...currentCourse,lessons: updatedLesson})
     }else{
-      setCurrentCourse({ ...currentCourse, packages: [...currentCourse.packages, lesson] })
+      setCurrentCourse({ ...currentCourse, lessons: [...currentCourse.lessons, lesson] })
+      console.log("updated")
     }
   }
 
@@ -45,7 +46,7 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
   }
 
   const validateAndUpdateCourse = () => {
-    if (currentCourse.description.length > 5 && currentCourse.name && currentCourse.packages.length > 0) {
+    if (currentCourse.description.length > 5 && currentCourse.name && currentCourse.lessons.length > 0) {
       addCourse(currentCourse)
       cancel()
     }
@@ -56,9 +57,9 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
   }, [editData])
 
   const handleRemoveLessonFromCourse = (lessonIndex) => {
-    const newPackages = [...currentCourse.packages];
-    newPackages.splice(lessonIndex, 1);
-    setCurrentCourse({...currentCourse, packages: newPackages });
+    const newLessons = [...currentCourse.lessons];
+    newLessons.splice(lessonIndex, 1);
+    setCurrentCourse({...currentCourse, lessons: newLessons });
   }
 
   const handleDelete = () => {
@@ -169,8 +170,8 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
         </div>
         <div className="content-list">
           {
-            currentCourse?.packages?.length > 0 &&
-            currentCourse?.packages?.map((lesson, index) => (
+            currentCourse?.lessons?.length > 0 &&
+            currentCourse?.lessons?.map((lesson, index) => (
               <div
                 className="lesson-list-item-cnt"
                 key={index}
@@ -193,13 +194,13 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
                 </div>
                 <div className="lesson-features-list" style={{ maxHeight: isfold === index ? '5rem' : 0 }}>
                   {
-                    lesson.features?.map((sublesson, subIndex) => (
+                    lesson.chapters?.map((chapter, subIndex) => (
                       <div className="features-cnt">
                         <div className="lesson-edit-delete-cnt">
-                          <img src={getFiletypeImg(sublesson.type)} alt="fileType" className="icon-image-small" />
-                          <p>{sublesson.name}</p>
+                          <img src={getFiletypeImg(chapter.type)} alt="fileType" className="icon-image-small" />
+                          <p>{chapter.name}</p>
                         </div>
-                        <p>{sublesson.duration}</p>
+                        <p>{chapter.duration}</p>
                       </div>
                     ))
                   }

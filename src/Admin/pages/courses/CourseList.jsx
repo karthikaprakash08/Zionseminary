@@ -4,8 +4,7 @@ import "./courses.css";
 
 // import courseList from "../Assets/Data/courseList.json";
 import { useNavigate } from "react-router-dom";
-import { getAllDegree } from "../../api/baseApi";
-import { getAllDegrees } from "../../firebase/degreeApi";
+import { getDegrees } from "../../firebase/lessonApi";
 
 const CourseList = () => {
   const navigate = useNavigate();
@@ -15,7 +14,8 @@ const CourseList = () => {
     const fetchCourses = async () => {
       try {
         if (courses === null) {
-          const QueryDocumentSnapshots = await getAllDegrees();
+          const QueryDocumentSnapshots = await getDegrees();
+          console.log(QueryDocumentSnapshots)
           SetCourses(QueryDocumentSnapshots);
         }
       } catch (error) {
