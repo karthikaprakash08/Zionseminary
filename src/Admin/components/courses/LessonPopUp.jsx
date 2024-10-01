@@ -23,7 +23,7 @@ const initialState = {
 const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
   const [currentLesson, setCurrentLesson] = useState({
     name: null,
-    features: [],
+    chapters: [],
     updateIndex: null,
   });
   const [currentSublesson, setCurrentSublesson] = useState(initialState);
@@ -47,27 +47,27 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
 
 
   const addSublessons = async () => {
-    const newLessons = [...currentLesson.features];
+    const newLessons = [...currentLesson.chapters];
     if (currentSublesson) {
       if (
         currentUpdateIndex === null ||
         currentUpdateIndex === undefined
       ) {
         newLessons.push(currentSublesson);
-        setCurrentLesson({ ...currentLesson, features: newLessons });
+        setCurrentLesson({ ...currentLesson, chapters: newLessons });
         setCurrentSublesson(initialState)
       } else {
         newLessons[currentUpdateIndex] = currentSublesson;
-        setCurrentLesson({ ...currentLesson, features: newLessons });
+        setCurrentLesson({ ...currentLesson, chapters: newLessons });
         setCurrentSublesson(initialState)
       }
     } else if (currentSublesson) {
       newLessons[currentSublesson.updateIndex] = currentSublesson;
-      setCurrentLesson({ ...currentLesson, features: newLessons });
+      setCurrentLesson({ ...currentLesson, chapters: newLessons });
       setCurrentSublesson(initialState)
     } else {
       newLessons[currentUpdateIndex] = currentSublesson
-      setCurrentLesson({ ...currentLesson, features: newLessons });
+      setCurrentLesson({ ...currentLesson, chapters: newLessons });
       setCurrentSublesson(initialState)
       setCurrentUpdateIndex(null)
     }
@@ -75,21 +75,21 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
 
 
   const validateAndUpdateLesson = () => {
-    if (currentLesson.name && currentLesson.features.length > 0) {
+    if (currentLesson.name && currentLesson.chapters.length > 0) {
       addLesson(currentLesson);
       cancel()
     }
   };
 
-  const setEditSublesson = (features, index) => {
-    setCurrentSublesson(features);
+  const setEditSublesson = (chapter, index) => {
+    setCurrentSublesson(chapter);
     setCurrentUpdateIndex(index)
   }
 
   const handleRemoveSublesson = (index) => {
-    const newsubLessons = [...currentLesson.features];
+    const newsubLessons = [...currentLesson.chapters];
     newsubLessons.splice(index, 1);
-    setCurrentLesson({ ...currentLesson, features: newsubLessons });
+    setCurrentLesson({ ...currentLesson, chapters: newsubLessons });
   };
 
 
@@ -116,7 +116,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
         openLessonTest && (
           <LessonTest
             closeTest={() => setOpenLessonTest(false)}
-            addTest={(testId) => setCurrentSublesson({ ...currentSublesson, testId: testId })}
+            addTest={(testId) => setCurrentSublesson({ ...currentSublesson, testId: testId,type:'test' })}
             testId={currentSublesson.testId}
           />)
       }
@@ -209,7 +209,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
           </div>
         </div>
         <div className="content-list">
-          {currentLesson?.features?.map((sublesson, index) => (
+          {currentLesson?.chapters?.map((chapter, index) => (
             <div
               className="lesson-content-input-cnt sublesson"
               key={index}
@@ -224,7 +224,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                   type="text"
                   name=""
                   id=""
-                  value={sublesson?.name}
+                  value={chapter?.name}
                   className="sublesson-title-input sublesson-card-input"
                 />
               </div>
@@ -235,14 +235,14 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                     type="text"
                     name=""
                     id=""
-                    value={sublesson?.duration}
+                    value={chapter?.duration}
                     className="sublesson-duration-input sublesson-title-input sublesson-card-input"
                   />
                 </div>
                 <div className="input-cnt add-sublesson-btn">
                   <div
                     className="sublesson-title-input center-media sublesson-card-input"
-                    onClick={() => window.open(sublesson?.link)}
+                    onClick={() => window.open(chapter?.link)}
                   >
                     <p className="sublesson-title-txt">open media</p>
                   </div>
@@ -264,7 +264,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
                       src={Edit}
                       alt="edit"
                       className="action-btn-img"
-                      onClick={() => setEditSublesson(sublesson, index)}
+                      onClick={() => setEditSublesson(chapter, index)}
                     />
                   </div>
                 </div>

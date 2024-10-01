@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Nolesson from "../../../assets/Images/no-lesson-illustration.svg";
-import Trash from "../../../assets/Images/trash.png";
-import Edit from "../../../assets/Images/edit.png";
-import EditImg from "../../../assets/Images/edit.png";
 import { useNavigate } from "react-router-dom";
 import NewLesson from "./NewLesson";
-import { addNewDegree } from "../../../api/baseApi";
-import { setNewDegree } from "../../../firebase/degreeApi";
+import { addDegree } from "../../../firebase/lessonApi";
 // import { addnewCourse } from "../../../api/baseApi";
 // import { convertToCourseFormData } from "../../../hooks/newCourseFunctions";
 
@@ -20,7 +16,7 @@ const NewCourse = () => {
 
   const navigate = useNavigate();
   const [courseData, setCourseData] = useState({
-    domain: "",
+    name: "",
     description: "",
     price: null,
     thumbnail: null,
@@ -60,13 +56,13 @@ const NewCourse = () => {
 
   const uploadCourse = async () => {
     if (
-      courseData.domain &&
+      courseData.name &&
       // courseData.description &&
       courseData.courses.length > 0 &&
       courseData.price
     ) {
       // const courseFormData = convertToCourseFormData(courseData)
-      const response = await setNewDegree(courseData);
+      const response = await addDegree(courseData);
       console.log(response);
       if (response) navigate('/admin')
     }
@@ -106,9 +102,9 @@ const NewCourse = () => {
               type="text"
               name=""
               id=""
-              value={courseData?.domain}
+              value={courseData?.name}
               className="name-input"
-              onChange={(e) => handledirectInput("domain", e.target.value)}
+              onChange={(e) => handledirectInput("name", e.target.value)}
             />
           </div>
 
@@ -172,7 +168,7 @@ const NewCourse = () => {
                     <h3 className="lesson-title">{lesson?.name}</h3>
                   </div>
                   <ul className="lesson-subtitle-cnt">
-                    {lesson?.packages?.map((sublesson) => (
+                    {lesson?.lessons?.map((sublesson) => (
                       <li>
                         <p className="lesson-subtitle">{sublesson?.name}</p>
                       </li>
