@@ -20,7 +20,7 @@ const initialState = {
 }
 
 
-const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson }) => {
+const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson,degreeId }) => {
   const [currentLesson, setCurrentLesson] = useState({
     name: null,
     chapters: [],

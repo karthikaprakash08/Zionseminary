@@ -10,6 +10,7 @@ import ArrowRight from "../../../assets/Images/arrow-right.png";
 import BackIcon from "../../../assets/Images/left-arrow.png";
 import AddTest from "./AddTest";
 import LessonPopUp from "../../../components/courses/LessonPopUp";
+import { addCourseToDegree } from "../../../firebase/lessonApi";
 
 
 const initialState = {
@@ -20,24 +21,31 @@ const initialState = {
   testId: null,
 }
 
-const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
+const NewLesson = ({ addCourse, cancel, editData, removeThisCourse, degreeId }) => {
   const [currentCourse, setCurrentCourse] = useState(initialState)
   const [openTest, setOpenTest] = useState({ open: false, data: null })
   const [isfold, setFold] = useState(null)
   const [openLessonPopUP, setOPenLessonPopUP] = useState({ open: false, data: null })
 
   const addLessonToCourse = (lesson) => {
-    console.log(lesson,"here")
-    if(lesson?.updateIndex !== null){
-      console.log(lesson.updateIndex)
-      let updatedLesson = [...currentCourse.lessons]
-      updatedLesson[lesson.updateIndex] = lesson
-      setCurrentCourse({...currentCourse,lessons: updatedLesson})
-    }else{
-      setCurrentCourse({ ...currentCourse, lessons: [...currentCourse.lessons, lesson] })
-      console.log("updated")
+    let updatedLesson = currentCourse?.lessons ? [...currentCourse.lessons] : [];
+    console.log(lesson, "here", updatedLesson);
+
+    if (lesson?.updateIndex !== undefined && lesson.updateIndex !== null) {
+      if (lesson.updateIndex >= 0 && lesson.updateIndex < updatedLesson.length) {
+        console.log(lesson.updateIndex);
+        updatedLesson[lesson.updateIndex] = { ...lesson };
+      } else {
+        console.error("Invalid update index");
+      }
+    } else {
+      console.log("updated");
+      updatedLesson.push({ ...lesson });
     }
-  }
+    setCurrentCourse({ ...currentCourse, lessons: updatedLesson });
+    // cancel();
+  };
+
 
   const getFiletypeImg = (filetype) => {
     if (filetype === 'video') return Video
@@ -48,6 +56,7 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
   const validateAndUpdateCourse = () => {
     if (currentCourse.description.length > 5 && currentCourse.name && currentCourse.lessons.length > 0) {
       addCourse(currentCourse)
+      if (degreeId) addCourseToDegree(degreeId, currentCourse)
       cancel()
     }
   }
@@ -59,7 +68,7 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
   const handleRemoveLessonFromCourse = (lessonIndex) => {
     const newLessons = [...currentCourse.lessons];
     newLessons.splice(lessonIndex, 1);
-    setCurrentCourse({...currentCourse, lessons: newLessons });
+    setCurrentCourse({ ...currentCourse, lessons: newLessons });
   }
 
   const handleDelete = () => {
@@ -83,8 +92,9 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
             <LessonPopUp
               addLesson={(lesson) => addLessonToCourse(lesson)}
               editData={openLessonPopUP.data}
-              removeThisLesson={(lessonIndex)=> handleRemoveLessonFromCourse(lessonIndex)}
+              removeThisLesson={(lessonIndex) => handleRemoveLessonFromCourse(lessonIndex)}
               cancel={() => setOPenLessonPopUP({ open: false, data: null })}
+              degreeId={degreeId}
             />
           )
         }
@@ -183,7 +193,7 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse }) => {
                     <p>{lesson.name}</p>
                   </div>
                   <div className="lesson-edit-delete-cnt">
-                    <img src={Edit} alt="edit" className="edit-img" onClick={() => setOPenLessonPopUP({ open: true, data: {...lesson,updateIndex:index} })} />
+                    <img src={Edit} alt="edit" className="edit-img" onClick={() => setOPenLessonPopUP({ open: true, data: { ...lesson, updateIndex: index } })} />
                     <img
                       src={Trash}
                       alt="trash"

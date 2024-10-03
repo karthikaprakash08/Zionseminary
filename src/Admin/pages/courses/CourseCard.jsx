@@ -17,7 +17,7 @@ const CourseCard = ({ data }) => {
         alt={data?.image}
         className="course-img"
       />
-      <h4 className="course-card-title">{data?.domain}</h4>
+      <h4 className="course-card-title">{data?.name}</h4>
       <p className="course-card-description">{data?.description?.slice(0,80)}..</p>
       <div className="course-edit-btn">
       <p>Edit Course</p>

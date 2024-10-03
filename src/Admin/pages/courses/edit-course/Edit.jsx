@@ -8,6 +8,7 @@ import BackIcon from "../../../assets/Images/left-arrow.png";
 import { useNavigate } from "react-router-dom";
 import NewLesson from "../new-course/NewLesson";
 import { deleteDegree, updateDegree } from "../../../firebase/degreeApi";
+import { editDegree } from "../../../firebase/lessonApi";
 
 const Edit = ({ courseDetails }) => {
   const [popupOpen, setPopupOpen] = useState({ open: false, data: null });
@@ -81,19 +82,20 @@ const Edit = ({ courseDetails }) => {
       newCourse[lesson.updateIndex] = lesson;
       setCourseData({ ...courseData, courses: newCourse });
     }
+
     setPopupOpen({ open: false });
   };
 
   const uploadCourse = async () => {
     if (
-      courseData.domain &&
+      courseData.name &&
       // courseData.description &&
       courseData.courses.length > 0
       // courseData.price
     ) {
       try {
         console.log(courseDetails)
-        const res = await updateDegree(courseData, courseDetails.id);
+        const res = await editDegree( courseDetails.id,courseData);
         if (res) navigate("/admin");
       } catch (error) {
         console.log(error);
@@ -207,9 +209,9 @@ const Edit = ({ courseDetails }) => {
               name=""
               id=""
               className="name-input"
-              value={courseData.domain}
+              value={courseData.name}
               readOnly={editCourse ? false : true}
-              onChange={(e) => handledirectInput("domain", e.target.value)}
+              onChange={(e) => handledirectInput("name", e.target.value)}
             />
           </div>
           <div className="flex-input">
@@ -265,7 +267,7 @@ const Edit = ({ courseDetails }) => {
                     <h3 className="lesson-title">{lesson?.name}</h3>
                   </div>
                   <ul className="lesson-subtitle-cnt">
-                    {lesson?.packages?.map((feature) => (
+                    {lesson?.lessons?.map((feature) => (
                       <li>
                         <p className="lesson-subtitle">{feature?.name}</p>
                         <p className="lesson-duration-txt">
@@ -294,6 +296,7 @@ const Edit = ({ courseDetails }) => {
           editData={popupOpen?.data}
           cancel={() => setPopupOpen({ open: false, data: null })}
           removeThisCourse={(index) => handleDeleteCourse(index)}
+          degreeId={courseData.degreeId}
         />
       )}
     </div>
