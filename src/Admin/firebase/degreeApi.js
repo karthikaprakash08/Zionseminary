@@ -1,10 +1,11 @@
-import { db, storage } from './firebase'; 
+import { db, storage } from './firebase';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
-import { uploadToVimeo } from './externalServices'; 
+import { uploadToVimeo } from './externalServices';
 import { v4 as uuidv4 } from 'uuid';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'; 
-import { addNewTest, updateTest } from './testApi'; 
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { addNewTest, updateTest } from './testApi';
 
+// Upload file to storage
 export const uploadFile = async (file, type) => {
   let fileURL = '';
   try {
@@ -12,8 +13,8 @@ export const uploadFile = async (file, type) => {
       fileURL = await uploadToVimeo(file);
     } else if (['image', 'document', 'pdf', 'ppt'].includes(type)) {
       const fileRef = ref(storage, `${type}s/${uuidv4()}_${file.name}`);
-      await uploadBytes(fileRef, file);  
-      fileURL = await getDownloadURL(fileRef); 
+      await uploadBytes(fileRef, file);
+      fileURL = await getDownloadURL(fileRef);
       console.log('File uploaded to Firebase Storage, URL:', fileURL);
     }
     return fileURL;
@@ -26,11 +27,11 @@ export const uploadFile = async (file, type) => {
 // Add Degree with courses
 export const addDegree = async (degreeData) => {
   try {
-    const degreeId = uuidv4(); 
+    const degreeId = uuidv4();
     const courses = await Promise.all(degreeData.courses.map(async (course) => {
       let thumbnailUrl = '';
       if (course.thumbnail) {
-        thumbnailUrl = await uploadFile(course.thumbnail, 'image');  
+        thumbnailUrl = await uploadFile(course.thumbnail, 'image');
       }
 
       return {
@@ -142,7 +143,7 @@ export const editCourse = async (degreeId, courseId, updatedCourseData) => {
     const degreeSnapshot = await getDoc(degreeRef);
     const degreeData = degreeSnapshot.data();
 
-    const updatedCourses = degreeData.courses.map(course => 
+    const updatedCourses = degreeData.courses.map(course =>
       course.course_id === courseId
         ? { ...course, ...updatedCourseData, updatedAt: Date.now() }
         : course
@@ -177,128 +178,127 @@ export const deleteCourse = async (degreeId, courseId) => {
 
 // Add Lesson to a Course
 export const addLessonToCourse = async (degreeId, courseId, lessonData) => {
-    try {
-      const degreeRef = doc(db, 'degrees', degreeId);
-      const degreeSnapshot = await getDoc(degreeRef);
-      const degreeData = degreeSnapshot.data();
-  
-      const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
-        if (course.course_id === courseId) {
-          const newLesson = {
-            lesson_id: uuidv4(),
-            title: lessonData.title,
-            description: lessonData.description,
-            chapters: await Promise.all(lessonData.chapters.map(async (chapter) => {
-              return {
-                title: chapter.title,
-                type: chapter.type,
-                link: chapter.file ? await uploadFile(chapter.file, chapter.type) : '',
-                duration: chapter.duration,
-              };
-            })),
-          };
-  
-          // Create a new test using the testApi
-          if (lessonData.test) {
-            const testId = await addNewTest(lessonData.test); 
-            newLesson.test_id = testId; 
-          }
-  
-          return {
-            ...course,
-            lessons: [...(course.lessons || []), newLesson],
-          };
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
+      if (course.course_id === courseId) {
+        const newLesson = {
+          lesson_id: uuidv4(),
+          title: lessonData.title,
+          description: lessonData.description,
+          chapters: await Promise.all(lessonData.chapters.map(async (chapter) => {
+            return {
+              title: chapter.title,
+              type: chapter.type,
+              link: chapter.file ? await uploadFile(chapter.file, chapter.type) : '',
+              duration: chapter.duration,
+            };
+          })),
+        };
+
+        // Create a new test using the testApi
+        if (lessonData.test) {
+          const testId = await addNewTest(lessonData.test);
+          newLesson.test_id = testId;
         }
-        return course;
-      }));
-  
-      await updateDoc(degreeRef, { courses: updatedCourses });
-      console.log('Lesson successfully added to course!');
-      return true;
-    } catch (error) {
-      console.error('Error adding lesson:', error);
-      return false;
-    }
-  };
-  
- // Edit Lesson
+
+        return {
+          ...course,
+          lessons: [...(course.lessons || []), newLesson],
+        };
+      }
+      return course;
+    }));
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Lesson successfully added to course!');
+    return true;
+  } catch (error) {
+    console.error('Error adding lesson:', error);
+    return false;
+  }
+};
+
+// Edit Lesson
 export const editLesson = async (degreeId, courseId, lessonId, updatedLessonData) => {
-    try {
-      const degreeRef = doc(db, 'degrees', degreeId);
-      const degreeSnapshot = await getDoc(degreeRef);
-      const degreeData = degreeSnapshot.data();
-  
-      const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
-        if (course.course_id === courseId) {
-          const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
-            if (lesson.lesson_id === lessonId) {
-              const updatedLesson = { ...lesson, ...updatedLessonData, updatedAt: Date.now() };
-  
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
+      if (course.course_id === courseId) {
+        const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
+          if (lesson.lesson_id === lessonId) {
+            const updatedLesson = { ...lesson, ...updatedLessonData, updatedAt: Date.now() };
+
             
-              if (updatedLessonData.test) {
-                const updatedTestId = await updateTest(lesson.test_id, updatedLessonData.test); 
-                updatedLesson.test_id = updatedTestId; 
-              }
-  
-              return updatedLesson;
+            if (updatedLessonData.test) {
+              const updatedTestId = await updateTest(lesson.test_id, updatedLessonData.test);
+              updatedLesson.test_id = updatedTestId;
             }
-            return lesson;
-          }));
-          
-          return { ...course, lessons: updatedLessons };
-        }
-        return course;
-      }));
-  
-      await updateDoc(degreeRef, { courses: updatedCourses });
-      console.log('Lesson updated successfully!');
-      return true;
-    } catch (error) {
-      console.error('Error updating lesson:', error);
-      return false;
-    }
-  };
-  
+
+            return updatedLesson;
+          }
+          return lesson;
+        }));
+
+        return { ...course, lessons: updatedLessons };
+      }
+      return course;
+    }));
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Lesson updated successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error updating lesson:', error);
+    return false;
+  }
+};
 
 // Add Chapter to a Lesson
 export const addChapterToLesson = async (degreeId, courseId, lessonId, chapterData) => {
-    try {
-      const degreeRef = doc(db, 'degrees', degreeId);
-      const degreeSnapshot = await getDoc(degreeRef);
-      const degreeData = degreeSnapshot.data();
-  
-      //link for the new chapter
-      const newChapterLink = chapterData.file ? await uploadFile(chapterData.file, chapterData.type) : '';
-  
-      const updatedCourses = degreeData.courses.map(course => {
-        if (course.course_id === courseId) {
-          const updatedLessons = course.lessons.map(lesson => {
-            if (lesson.lesson_id === lessonId) {
-              const newChapter = {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
 
-                title: chapterData.title,
-                type: chapterData.type,
-                link: newChapterLink,
-                duration: chapterData.duration,
-              };
-              return { ...lesson, chapters: [...(lesson.chapters || []), newChapter] };
-            }
-            return lesson;
-          });
-          return { ...course, lessons: updatedLessons };
-        }
-        return course;
-      });
-  
-      await updateDoc(degreeRef, { courses: updatedCourses });
-      console.log('Chapter successfully added to lesson!');
-      return true;
-    } catch (error) {
-      console.error('Error adding chapter:', error);
-      return null;
-    }
-  };
-  
+    const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
+      if (course.course_id === courseId) {
+        const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
+          if (lesson.lesson_id === lessonId) {
+            const newChapter = {
+              title: chapterData.title,
+              type: chapterData.type,
+              link: chapterData.file ? await uploadFile(chapterData.file, chapterData.type) : '',
+              duration: chapterData.duration,
+            };
+
+            return {
+              ...lesson,
+              chapters: [...(lesson.chapters || []), newChapter],
+            };
+          }
+          return lesson;
+        }));
+
+        return { ...course, lessons: updatedLessons };
+      }
+      return course;
+    }));
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Chapter added successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error adding chapter:', error);
+    return false;
+  }
+};
 
 // Edit Chapter
 export const editChapter = async (degreeId, courseId, lessonId, chapterId, updatedChapterData) => {
@@ -307,23 +307,23 @@ export const editChapter = async (degreeId, courseId, lessonId, chapterId, updat
     const degreeSnapshot = await getDoc(degreeRef);
     const degreeData = degreeSnapshot.data();
 
-    const updatedCourses = degreeData.courses.map(course => {
+    const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
       if (course.course_id === courseId) {
-        const updatedLessons = course.lessons.map(lesson => {
+        const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
           if (lesson.lesson_id === lessonId) {
-            const updatedChapters = lesson.chapters.map(chapter => 
-              chapter.id === chapterId
-                ? { ...chapter, ...updatedChapterData, updatedAt: Date.now() }
-                : chapter
+            const updatedChapters = lesson.chapters.map((chapter) =>
+              chapter.title === chapterId ? { ...chapter, ...updatedChapterData, updatedAt: Date.now() } : chapter
             );
+
             return { ...lesson, chapters: updatedChapters };
           }
           return lesson;
-        });
+        }));
+
         return { ...course, lessons: updatedLessons };
       }
       return course;
-    });
+    }));
 
     await updateDoc(degreeRef, { courses: updatedCourses });
     console.log('Chapter updated successfully!');
@@ -341,19 +341,20 @@ export const deleteChapter = async (degreeId, courseId, lessonId, chapterId) => 
     const degreeSnapshot = await getDoc(degreeRef);
     const degreeData = degreeSnapshot.data();
 
-    const updatedCourses = degreeData.courses.map(course => {
+    const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
       if (course.course_id === courseId) {
-        const updatedLessons = course.lessons.map(lesson => {
+        const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
           if (lesson.lesson_id === lessonId) {
-            const updatedChapters = lesson.chapters.filter(chapter => chapter.id !== chapterId);
+            const updatedChapters = lesson.chapters.filter(chapter => chapter.title !== chapterId);
             return { ...lesson, chapters: updatedChapters };
           }
           return lesson;
-        });
+        }));
+
         return { ...course, lessons: updatedLessons };
       }
       return course;
-    });
+    }));
 
     await updateDoc(degreeRef, { courses: updatedCourses });
     console.log('Chapter deleted successfully!');
@@ -361,36 +362,5 @@ export const deleteChapter = async (degreeId, courseId, lessonId, chapterId) => 
   } catch (error) {
     console.error('Error deleting chapter:', error);
     return false;
-  }
-};
-
-// Get all Degrees
-export const getAllDegrees = async () => {
-  try {
-    const degreesSnapshot = await getDocs(collection(db, 'degrees'));
-    const degrees = degreesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    console.log('Degrees fetched successfully!');
-    return degrees;
-  } catch (error) {
-    console.error('Error fetching degrees:', error);
-    return null;
-  }
-};
-
-// Get Degree by ID
-export const getDegreeById = async (degreeId) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const degreeSnapshot = await getDoc(degreeRef);
-    if (degreeSnapshot.exists()) {
-      console.log('Degree fetched successfully!');
-      return { id: degreeSnapshot.id, ...degreeSnapshot.data() };
-    } else {
-      console.log('No such degree found!');
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching degree:', error);
-    return null;
   }
 };
