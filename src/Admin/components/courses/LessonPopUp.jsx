@@ -8,6 +8,7 @@ import LoadingGif from "../../assets/gif/loading.gif";
 import Upload from "../../assets/Images/upload.png";
 import { uploadFile } from '../../firebase/lessonApi';
 import LessonTest from './LessonTest';
+import { toast } from 'react-toastify';
 
 
 const initialState = {
@@ -20,7 +21,7 @@ const initialState = {
 }
 
 
-const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson,degreeId }) => {
+const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }) => {
   const [currentLesson, setCurrentLesson] = useState({
     name: null,
     chapters: [],
@@ -47,37 +48,31 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson,degreeId })
 
 
   const addSublessons = async () => {
+    if (!currentSublesson.duration || !currentSublesson.type || !currentSublesson.name) { 
+      toast.error('fill all details and add a test or file')
+      return
+     };
+
     const newLessons = [...currentLesson.chapters];
-    if (currentSublesson) {
-      if (
-        currentUpdateIndex === null ||
-        currentUpdateIndex === undefined
-      ) {
-        newLessons.push(currentSublesson);
-        setCurrentLesson({ ...currentLesson, chapters: newLessons });
-        setCurrentSublesson(initialState)
-      } else {
-        newLessons[currentUpdateIndex] = currentSublesson;
-        setCurrentLesson({ ...currentLesson, chapters: newLessons });
-        setCurrentSublesson(initialState)
-      }
-    } else if (currentSublesson) {
-      newLessons[currentSublesson.updateIndex] = currentSublesson;
-      setCurrentLesson({ ...currentLesson, chapters: newLessons });
-      setCurrentSublesson(initialState)
+
+    if (currentUpdateIndex !== null && currentUpdateIndex !== undefined) {
+      newLessons[currentUpdateIndex] = currentSublesson;
     } else {
-      newLessons[currentUpdateIndex] = currentSublesson
-      setCurrentLesson({ ...currentLesson, chapters: newLessons });
-      setCurrentSublesson(initialState)
-      setCurrentUpdateIndex(null)
+      newLessons.push(currentSublesson);
     }
+    setCurrentLesson({ ...currentLesson, chapters: newLessons });
+    setCurrentSublesson(initialState);
+    setCurrentUpdateIndex(null);
   };
+
 
 
   const validateAndUpdateLesson = () => {
     if (currentLesson.name && currentLesson.chapters.length > 0) {
       addLesson(currentLesson);
       cancel()
+    } else {
+      toast.error('Please add at least one subLesson and Lesson details')
     }
   };
 
@@ -116,7 +111,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson,degreeId })
         openLessonTest && (
           <LessonTest
             closeTest={() => setOpenLessonTest(false)}
-            addTest={(testId) => setCurrentSublesson({ ...currentSublesson, testId: testId,type:'test' })}
+            addTest={(testId) => setCurrentSublesson({ ...currentSublesson, testId: testId, type: 'test' })}
             testId={currentSublesson.testId}
           />)
       }

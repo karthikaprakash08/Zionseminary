@@ -7,8 +7,8 @@ import Nolesson from "../../../assets/Images/no-lesson-illustration.svg";
 import BackIcon from "../../../assets/Images/left-arrow.png";
 import { useNavigate } from "react-router-dom";
 import NewLesson from "../new-course/NewLesson";
-import { deleteDegree, updateDegree } from "../../../firebase/degreeApi";
-import { editDegree } from "../../../firebase/lessonApi";
+import { deleteDegree, editDegree } from "../../../firebase/lessonApi";
+import { toast } from "react-toastify";
 
 const Edit = ({ courseDetails }) => {
   const [popupOpen, setPopupOpen] = useState({ open: false, data: null });
@@ -95,13 +95,20 @@ const Edit = ({ courseDetails }) => {
     ) {
       try {
         console.log(courseDetails)
-        const res = await editDegree( courseDetails.id,courseData);
+        const res = await toast.promise(
+          editDegree(courseDetails.id, courseData), 
+          {
+            pending: "Updating course...",
+            success: "Course updated successfully",
+            error: "An error occurred while updating the course"
+          }
+        );
         if (res) navigate("/admin");
       } catch (error) {
         console.log(error);
       }
     } else {
-      window.alert(
+      toast.error(
         "This course is not valid add at least on lesson and fill other details"
       );
     }
@@ -113,7 +120,11 @@ const Edit = ({ courseDetails }) => {
     );
     if (confirm) {
       try {
-        const res = await deleteDegree(courseDetails.id);
+        const res = await toast.promise(deleteDegree(courseDetails.id), {
+          pending: "deleting degree...",
+          success: "Degree deleted successfully",
+          error: "An error occurred while deleting Degree"
+        })
         if (res) navigate("/admin");
       } catch (error) {
         console.log(error);
@@ -127,11 +138,11 @@ const Edit = ({ courseDetails }) => {
     setCourseData({ ...courseData, overviewPoints: newOverviews });
   };
 
-  
+
   const handleDeleteCourse = (courseIndex) => {
-    const newCourseData = [ ...courseData.courses]
+    const newCourseData = [...courseData.courses]
     newCourseData.splice(courseIndex, 1);
-    setCourseData({...courseData, courses: newCourseData });
+    setCourseData({ ...courseData, courses: newCourseData });
   }
 
   const openEditLesson = (lesson, index) => {

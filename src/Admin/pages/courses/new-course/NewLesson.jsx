@@ -11,6 +11,7 @@ import BackIcon from "../../../assets/Images/left-arrow.png";
 import AddTest from "./AddTest";
 import LessonPopUp from "../../../components/courses/LessonPopUp";
 import { addCourseToDegree } from "../../../firebase/lessonApi";
+import { toast } from "react-toastify";
 
 
 const initialState = {
@@ -58,6 +59,8 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse, degreeId }) 
       addCourse(currentCourse)
       if (degreeId) addCourseToDegree(degreeId, currentCourse)
       cancel()
+    }else{
+      toast.error('Please add at least one Lesson and course details')
     }
   }
 
