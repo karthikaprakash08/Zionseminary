@@ -3,6 +3,7 @@ import Nolesson from "../../../assets/Images/no-lesson-illustration.svg";
 import { useNavigate } from "react-router-dom";
 import NewLesson from "./NewLesson";
 import { addDegree } from "../../../firebase/lessonApi";
+import { toast } from "react-toastify";
 // import { addnewCourse } from "../../../api/baseApi";
 // import { convertToCourseFormData } from "../../../hooks/newCourseFunctions";
 
@@ -31,11 +32,11 @@ const NewCourse = () => {
   const handledirectInput = (type, value) => {
     setCourseData({ ...courseData, [type]: value });
   };
-  
+
   const handleDeleteCourse = (courseIndex) => {
-    const newCourseData = [ ...courseData.courses]
+    const newCourseData = [...courseData.courses]
     newCourseData.splice(courseIndex, 1);
-    setCourseData({...courseData, courses: newCourseData });
+    setCourseData({ ...courseData, courses: newCourseData });
   }
 
   const addLessontoCourse = (lesson) => {
@@ -62,9 +63,15 @@ const NewCourse = () => {
       courseData.price
     ) {
       // const courseFormData = convertToCourseFormData(courseData)
-      const response = await addDegree(courseData);
+      const response = await toast.promise(addDegree(courseData), {
+        pending: "adding degree...",
+        success: "Degree added successfully",
+        error: "An error occurred while adding new Degree"
+      })
       console.log(response);
       if (response) navigate('/admin')
+    } else {
+      toast.error('Please add at least one course and degree details')
     }
   };
 
