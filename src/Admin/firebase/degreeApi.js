@@ -440,3 +440,33 @@ export const deleteTest = async (degreeId, courseId, lessonId, testId) => {
     return false;
   }
 };
+
+// Get a degree by ID
+export const getDegreeById = async (degreeId) => {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    if (degreeSnapshot.exists()) {
+      return degreeSnapshot.data();
+    } else {
+      console.log('No such degree found!');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error getting degree:', error);
+    return null;
+  }
+};
+
+// Get all degrees
+export const getAllDegrees = async () => {
+  try {
+    const degreesCollectionRef = collection(db, 'degrees');
+    const degreesSnapshot = await getDocs(degreesCollectionRef);
+    const degreesList = degreesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return degreesList;
+  } catch (error) {
+    console.error('Error getting all degrees:', error);
+    return [];
+  }
+};
