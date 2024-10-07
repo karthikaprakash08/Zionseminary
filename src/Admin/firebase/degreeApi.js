@@ -3,9 +3,9 @@ import { collection, addDoc, updateDoc, deleteDoc, doc, getDoc, getDocs } from '
 import { uploadToVimeo } from './externalServices';
 import { v4 as uuidv4 } from 'uuid';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { addNewTest, updateTest } from './testApi';
 
-// Upload file to storage
+
+// Upload file
 export const uploadFile = async (file, type) => {
   let fileURL = '';
   try {
@@ -24,7 +24,22 @@ export const uploadFile = async (file, type) => {
   }
 };
 
-// Add Degree with courses
+// Add new test for lessons or end of the course 
+const createTestObject = (testData) => {
+  return {
+    test_id: uuidv4(),
+    title: testData.title,
+    timeLimit: testData.timeLimit,
+    type: testData.type, // quiz or paragraph
+    questions: testData.questions.map((question) => ({
+      question: question.question,
+      options: question.options || null,  
+      correctAnswer: question.correctAnswer || null, 
+    })),
+  };
+};
+
+// Add Degree with courses, lessons, and tests
 export const addDegree = async (degreeData) => {
   try {
     const degreeId = uuidv4();
@@ -34,39 +49,45 @@ export const addDegree = async (degreeData) => {
         thumbnailUrl = await uploadFile(course.thumbnail, 'image');
       }
 
+      const courseLessons = await Promise.all(course.lessons.map(async (lesson) => {
+        const lessonChapters = await Promise.all(lesson.chapters.map(async (chapter) => {
+          return {
+            title: chapter.title,
+            type: chapter.type,
+            link: chapter.link,
+            duration: chapter.duration,
+          };
+        }));
+
+        let lessonTest = null;
+        if (lesson.test) {
+          lessonTest = createTestObject(lesson.test); 
+        }
+
+        return {
+          lesson_id: uuidv4(),
+          title: lesson.title,
+          description: lesson.description,
+          chapters: lessonChapters,
+          test: lessonTest, // Add the test to each lesson
+        };
+      }));
+
+      let finalTest = null;
+      if (course.finalTest) {
+        finalTest = createTestObject(course.finalTest); // Create a final test for the course
+      }
+
       return {
         course_id: uuidv4(),
         title: course.title,
         overviewPoints: course.overviewPoints,
         description: course.description,
         image: course.image || '',
-        lessons: await Promise.all(course.lessons.map(async (lesson) => {
-          return {
-            lesson_id: uuidv4(),
-            title: lesson.title,
-            description: lesson.description,
-            chapters: await Promise.all(lesson.chapters.map(async (chapter) => {
-              return {
-                title: chapter.title,
-                type: chapter.type,
-                link: chapter.link,
-                duration: chapter.duration,
-              };
-            })),
-            test: lesson.test ? {
-              test_id: lesson.test.test_id,
-              title: lesson.test.title,
-              timeLimit: lesson.test.timeLimit,
-              questions: lesson.test.questions.map((question) => ({
-                question: question.question,
-                options: question.options,
-                correctAnswer: question.correctAnswer,
-              })),
-            } : null,
-          };
-        })),
+        lessons: courseLessons,
         header: course.header || '',
         videoUrl: course.videoUrl || '',
+        finalTest: finalTest, // Add the final test to the course
       };
     }));
 
@@ -80,7 +101,7 @@ export const addDegree = async (degreeData) => {
       createdAt: Date.now(),
     });
 
-    console.log('Degree with courses successfully saved to Firestore!');
+    console.log('Degree with courses, lessons, and tests successfully saved to Firestore!');
     return degreeId;
   } catch (error) {
     console.error('Error saving degree:', error);
@@ -113,69 +134,6 @@ export const deleteDegree = async (degreeId) => {
   }
 };
 
-// Add Course under a Degree
-export const addCourseToDegree = async (degreeId, courseData) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const newCourse = {
-      course_id: uuidv4(),
-      title: courseData.title,
-      description: courseData.description,
-      createdAt: Date.now(),
-    };
-
-    await updateDoc(degreeRef, {
-      courses: firebase.firestore.FieldValue.arrayUnion(newCourse),
-    });
-
-    console.log('Course successfully added to degree!');
-    return newCourse.course_id;
-  } catch (error) {
-    console.error('Error adding course:', error);
-    return null;
-  }
-};
-
-// Edit Course
-export const editCourse = async (degreeId, courseId, updatedCourseData) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const degreeSnapshot = await getDoc(degreeRef);
-    const degreeData = degreeSnapshot.data();
-
-    const updatedCourses = degreeData.courses.map(course =>
-      course.course_id === courseId
-        ? { ...course, ...updatedCourseData, updatedAt: Date.now() }
-        : course
-    );
-
-    await updateDoc(degreeRef, { courses: updatedCourses });
-    console.log('Course updated successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error updating course:', error);
-    return false;
-  }
-};
-
-// Delete Course
-export const deleteCourse = async (degreeId, courseId) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const degreeSnapshot = await getDoc(degreeRef);
-    const degreeData = degreeSnapshot.data();
-
-    const updatedCourses = degreeData.courses.filter(course => course.course_id !== courseId);
-
-    await updateDoc(degreeRef, { courses: updatedCourses });
-    console.log('Course deleted successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error deleting course:', error);
-    return false;
-  }
-};
-
 // Add Lesson to a Course
 export const addLessonToCourse = async (degreeId, courseId, lessonData) => {
   try {
@@ -199,10 +157,8 @@ export const addLessonToCourse = async (degreeId, courseId, lessonData) => {
           })),
         };
 
-        // Create a new test using the testApi
         if (lessonData.test) {
-          const testId = await addNewTest(lessonData.test);
-          newLesson.test_id = testId;
+          newLesson.test = createTestObject(lessonData.test); // Add test to new lesson
         }
 
         return {
@@ -218,44 +174,6 @@ export const addLessonToCourse = async (degreeId, courseId, lessonData) => {
     return true;
   } catch (error) {
     console.error('Error adding lesson:', error);
-    return false;
-  }
-};
-
-// Edit Lesson
-export const editLesson = async (degreeId, courseId, lessonId, updatedLessonData) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const degreeSnapshot = await getDoc(degreeRef);
-    const degreeData = degreeSnapshot.data();
-
-    const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
-      if (course.course_id === courseId) {
-        const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
-          if (lesson.lesson_id === lessonId) {
-            const updatedLesson = { ...lesson, ...updatedLessonData, updatedAt: Date.now() };
-
-            
-            if (updatedLessonData.test) {
-              const updatedTestId = await updateTest(lesson.test_id, updatedLessonData.test);
-              updatedLesson.test_id = updatedTestId;
-            }
-
-            return updatedLesson;
-          }
-          return lesson;
-        }));
-
-        return { ...course, lessons: updatedLessons };
-      }
-      return course;
-    }));
-
-    await updateDoc(degreeRef, { courses: updatedCourses });
-    console.log('Lesson updated successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error updating lesson:', error);
     return false;
   }
 };
@@ -300,30 +218,121 @@ export const addChapterToLesson = async (degreeId, courseId, lessonId, chapterDa
   }
 };
 
-// Edit Chapter
+
+//  Edit Course
+export const editCourse = async (degreeId, courseId, updatedCourseData) => {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    const updatedCourses = degreeData.courses.map((course) =>
+      course.course_id === courseId
+        ? { ...course, ...updatedCourseData, updatedAt: Date.now() }
+        : course
+    );
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Course updated successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error updating course:', error);
+    return false;
+  }
+};
+
+// Delete Course
+export const deleteCourse = async (degreeId, courseId) => {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    const updatedCourses = degreeData.courses.filter((course) => course.course_id !== courseId);
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Course deleted successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error deleting course:', error);
+    return false;
+  }
+};
+
+//  Edit Lesson
+export const editLesson = async (degreeId, courseId, lessonId, updatedLessonData) => {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    const updatedCourses = degreeData.courses.map((course) => {
+      if (course.course_id === courseId) {
+        const updatedLessons = course.lessons.map((lesson) =>
+          lesson.lesson_id === lessonId
+            ? { ...lesson, ...updatedLessonData, updatedAt: Date.now() }
+            : lesson
+        );
+        return { ...course, lessons: updatedLessons };
+      }
+      return course;
+    });
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Lesson updated successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error updating lesson:', error);
+    return false;
+  }
+};
+
+// Delete Lesson
+export const deleteLesson = async (degreeId, courseId, lessonId) => {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    const updatedCourses = degreeData.courses.map((course) => {
+      if (course.course_id === courseId) {
+        const updatedLessons = course.lessons.filter((lesson) => lesson.lesson_id !== lessonId);
+        return { ...course, lessons: updatedLessons };
+      }
+      return course;
+    });
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Lesson deleted successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error deleting lesson:', error);
+    return false;
+  }
+};
+
+//  Edit Chapter
 export const editChapter = async (degreeId, courseId, lessonId, chapterId, updatedChapterData) => {
   try {
     const degreeRef = doc(db, 'degrees', degreeId);
     const degreeSnapshot = await getDoc(degreeRef);
     const degreeData = degreeSnapshot.data();
 
-    const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
+    const updatedCourses = degreeData.courses.map((course) => {
       if (course.course_id === courseId) {
-        const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
+        const updatedLessons = course.lessons.map((lesson) => {
           if (lesson.lesson_id === lessonId) {
             const updatedChapters = lesson.chapters.map((chapter) =>
               chapter.title === chapterId ? { ...chapter, ...updatedChapterData, updatedAt: Date.now() } : chapter
             );
-
             return { ...lesson, chapters: updatedChapters };
           }
           return lesson;
-        }));
-
+        });
         return { ...course, lessons: updatedLessons };
       }
       return course;
-    }));
+    });
 
     await updateDoc(degreeRef, { courses: updatedCourses });
     console.log('Chapter updated successfully!');
@@ -334,33 +343,100 @@ export const editChapter = async (degreeId, courseId, lessonId, chapterId, updat
   }
 };
 
-// Delete Chapter
+//  Delete Chapter
 export const deleteChapter = async (degreeId, courseId, lessonId, chapterId) => {
   try {
     const degreeRef = doc(db, 'degrees', degreeId);
     const degreeSnapshot = await getDoc(degreeRef);
     const degreeData = degreeSnapshot.data();
 
-    const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
+    const updatedCourses = degreeData.courses.map((course) => {
       if (course.course_id === courseId) {
-        const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
+        const updatedLessons = course.lessons.map((lesson) => {
           if (lesson.lesson_id === lessonId) {
-            const updatedChapters = lesson.chapters.filter(chapter => chapter.title !== chapterId);
+            const updatedChapters = lesson.chapters.filter((chapter) => chapter.title !== chapterId);
             return { ...lesson, chapters: updatedChapters };
           }
           return lesson;
-        }));
-
+        });
         return { ...course, lessons: updatedLessons };
       }
       return course;
-    }));
+    });
 
     await updateDoc(degreeRef, { courses: updatedCourses });
     console.log('Chapter deleted successfully!');
     return true;
   } catch (error) {
     console.error('Error deleting chapter:', error);
+    return false;
+  }
+};
+
+// Edit Test 
+export const editTest = async (degreeId, courseId, lessonId, testId, updatedTestData) => {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    const updatedCourses = degreeData.courses.map((course) => {
+      if (course.course_id === courseId) {
+        const updatedLessons = course.lessons.map((lesson) => {
+          if (lesson.lesson_id === lessonId && lesson.test?.test_id === testId) {
+            lesson.test = { ...lesson.test, ...updatedTestData, updatedAt: Date.now() };
+          }
+          return lesson;
+        });
+
+        if (course.finalTest?.test_id === testId) {
+          course.finalTest = { ...course.finalTest, ...updatedTestData, updatedAt: Date.now() };
+        }
+
+        return { ...course, lessons: updatedLessons };
+      }
+      return course;
+    });
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Test updated successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error updating test:', error);
+    return false;
+  }
+};
+
+// Delete Test 
+export const deleteTest = async (degreeId, courseId, lessonId, testId) => {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    const updatedCourses = degreeData.courses.map((course) => {
+      if (course.course_id === courseId) {
+        const updatedLessons = course.lessons.map((lesson) => {
+          if (lesson.lesson_id === lessonId && lesson.test?.test_id === testId) {
+            lesson.test = null; 
+          }
+          return lesson;
+        });
+        
+        if (course.finalTest?.test_id === testId) {
+          course.finalTest = null;
+        }
+
+        return { ...course, lessons: updatedLessons };
+      }
+      return course;
+    });
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Test deleted successfully!');
+    return true;
+  } catch (error) {
+    console.error('Error deleting test:', error);
     return false;
   }
 };
