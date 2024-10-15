@@ -463,7 +463,6 @@ export const deleteChapter = async (degreeId, courseId, lessonId, chapterId) => 
         const updatedLessons = course.lessons.map((lesson) => {
           if (lesson.lesson_id === lessonId) {
             const updatedChapters = lesson.chapters.filter((chapter) => chapter.title !== chapterId);
-            const updatedChapters = lesson.chapters.filter((chapter) => chapter.title !== chapterId);
             return { ...lesson, chapters: updatedChapters };
           }
           return lesson;
