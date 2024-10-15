@@ -5,8 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 
-
-// Upload file
 // Upload file
 export const uploadFile = async (file, type) => {
   let fileURL = '';
@@ -87,10 +85,8 @@ export const addDegree = async (degreeData) => {
         description: course.description,
         image: course.image || '',
         lessons: courseLessons,
-        lessons: courseLessons,
         header: course.header || '',
         videoUrl: course.videoUrl || '',
-        finalTest: finalTest, // Add the final test to the course
         finalTest: finalTest, // Add the final test to the course
       };
     }));
@@ -105,7 +101,6 @@ export const addDegree = async (degreeData) => {
       createdAt: Date.now(),
     });
 
-    console.log('Degree with courses, lessons, and tests successfully saved to Firestore!');
     console.log('Degree with courses, lessons, and tests successfully saved to Firestore!');
     return degreeId;
   } catch (error) {
@@ -164,7 +159,6 @@ export const addLessonToCourse = async (degreeId, courseId, lessonData) => {
 
         if (lessonData.test) {
           newLesson.test = createTestObject(lessonData.test); // Add test to new lesson
-          newLesson.test = createTestObject(lessonData.test); // Add test to new lesson
         }
 
         return {
@@ -196,7 +190,6 @@ export const addChapterToLesson = async (degreeId, courseId, lessonId, chapterDa
         const updatedLessons = await Promise.all(course.lessons.map(async (lesson) => {
           if (lesson.lesson_id === lessonId) {
             const newChapter = {
-              chapter_id: uuidv4(),
               title: chapterData.title,
               type: chapterData.type,
               link: chapterData.file ? await uploadFile(chapterData.file, chapterData.type) : '',
@@ -319,100 +312,6 @@ export const deleteLesson = async (degreeId, courseId, lessonId) => {
 };
 
 //  Edit Chapter
-
-//  Edit Course
-export const editCourse = async (degreeId, courseId, updatedCourseData) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const degreeSnapshot = await getDoc(degreeRef);
-    const degreeData = degreeSnapshot.data();
-
-    const updatedCourses = degreeData.courses.map((course) =>
-      course.course_id === courseId
-        ? { ...course, ...updatedCourseData, updatedAt: Date.now() }
-        : course
-    );
-
-    await updateDoc(degreeRef, { courses: updatedCourses });
-    console.log('Course updated successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error updating course:', error);
-    return false;
-  }
-};
-
-// Delete Course
-export const deleteCourse = async (degreeId, courseId) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const degreeSnapshot = await getDoc(degreeRef);
-    const degreeData = degreeSnapshot.data();
-
-    const updatedCourses = degreeData.courses.filter((course) => course.course_id !== courseId);
-
-    await updateDoc(degreeRef, { courses: updatedCourses });
-    console.log('Course deleted successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error deleting course:', error);
-    return false;
-  }
-};
-
-//  Edit Lesson
-export const editLesson = async (degreeId, courseId, lessonId, updatedLessonData) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const degreeSnapshot = await getDoc(degreeRef);
-    const degreeData = degreeSnapshot.data();
-
-    const updatedCourses = degreeData.courses.map((course) => {
-      if (course.course_id === courseId) {
-        const updatedLessons = course.lessons.map((lesson) =>
-          lesson.lesson_id === lessonId
-            ? { ...lesson, ...updatedLessonData, updatedAt: Date.now() }
-            : lesson
-        );
-        return { ...course, lessons: updatedLessons };
-      }
-      return course;
-    });
-
-    await updateDoc(degreeRef, { courses: updatedCourses });
-    console.log('Lesson updated successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error updating lesson:', error);
-    return false;
-  }
-};
-
-// Delete Lesson
-export const deleteLesson = async (degreeId, courseId, lessonId) => {
-  try {
-    const degreeRef = doc(db, 'degrees', degreeId);
-    const degreeSnapshot = await getDoc(degreeRef);
-    const degreeData = degreeSnapshot.data();
-
-    const updatedCourses = degreeData.courses.map((course) => {
-      if (course.course_id === courseId) {
-        const updatedLessons = course.lessons.filter((lesson) => lesson.lesson_id !== lessonId);
-        return { ...course, lessons: updatedLessons };
-      }
-      return course;
-    });
-
-    await updateDoc(degreeRef, { courses: updatedCourses });
-    console.log('Lesson deleted successfully!');
-    return true;
-  } catch (error) {
-    console.error('Error deleting lesson:', error);
-    return false;
-  }
-};
-
-//  Edit Chapter
 export const editChapter = async (degreeId, courseId, lessonId, chapterId, updatedChapterData) => {
   try {
     const degreeRef = doc(db, 'degrees', degreeId);
@@ -420,9 +319,7 @@ export const editChapter = async (degreeId, courseId, lessonId, chapterId, updat
     const degreeData = degreeSnapshot.data();
 
     const updatedCourses = degreeData.courses.map((course) => {
-    const updatedCourses = degreeData.courses.map((course) => {
       if (course.course_id === courseId) {
-        const updatedLessons = course.lessons.map((lesson) => {
         const updatedLessons = course.lessons.map((lesson) => {
           if (lesson.lesson_id === lessonId) {
             const updatedChapters = lesson.chapters.map((chapter) =>
@@ -432,11 +329,9 @@ export const editChapter = async (degreeId, courseId, lessonId, chapterId, updat
           }
           return lesson;
         });
-        });
         return { ...course, lessons: updatedLessons };
       }
       return course;
-    });
     });
 
     await updateDoc(degreeRef, { courses: updatedCourses });
@@ -449,7 +344,6 @@ export const editChapter = async (degreeId, courseId, lessonId, chapterId, updat
 };
 
 //  Delete Chapter
-//  Delete Chapter
 export const deleteChapter = async (degreeId, courseId, lessonId, chapterId) => {
   try {
     const degreeRef = doc(db, 'degrees', degreeId);
@@ -457,9 +351,7 @@ export const deleteChapter = async (degreeId, courseId, lessonId, chapterId) => 
     const degreeData = degreeSnapshot.data();
 
     const updatedCourses = degreeData.courses.map((course) => {
-    const updatedCourses = degreeData.courses.map((course) => {
       if (course.course_id === courseId) {
-        const updatedLessons = course.lessons.map((lesson) => {
         const updatedLessons = course.lessons.map((lesson) => {
           if (lesson.lesson_id === lessonId) {
             const updatedChapters = lesson.chapters.filter((chapter) => chapter.title !== chapterId);
@@ -467,11 +359,9 @@ export const deleteChapter = async (degreeId, courseId, lessonId, chapterId) => 
           }
           return lesson;
         });
-        });
         return { ...course, lessons: updatedLessons };
       }
       return course;
-    });
     });
 
     await updateDoc(degreeRef, { courses: updatedCourses });
