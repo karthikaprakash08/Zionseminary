@@ -33,8 +33,8 @@ const createTestObject = (testData) => {
     type: testData.type, // quiz or paragraph
     questions: testData.questions.map((question) => ({
       question: question.question,
-      options: question.options || null,  
-      correctAnswer: question.correctAnswer || null, 
+      options: question.options || null,
+      correctAnswer: question.correctAnswer || null,
     })),
   };
 };
@@ -62,7 +62,7 @@ export const addDegree = async (degreeData) => {
 
         let lessonTest = null;
         if (lesson.test) {
-          lessonTest = createTestObject(lesson.test); 
+          lessonTest = createTestObject(lesson.test);
         }
 
         return {
@@ -159,11 +159,11 @@ export const addCourseToDegree = async (degreeId, courseData) => {
     };
 
     const updatedCourses = [...degreeData?.courses, newCourse]; // Add the new course
-    console.log("Updated",updatedCourses)
+    console.log("Updated", updatedCourses)
 
     await updateDoc(degreeRef, { courses: updatedCourses });
     console.log('Course successfully added to degree!');
-    return true;
+    return newCourse;
   } catch (error) {
     console.error('Error adding course:', error);
     return false;
@@ -177,13 +177,14 @@ export const addLessonToCourse = async (degreeId, courseId, lessonData) => {
     const degreeRef = doc(db, 'degrees', degreeId);
     const degreeSnapshot = await getDoc(degreeRef);
     const degreeData = degreeSnapshot.data();
+    let newLesson 
 
     const updatedCourses = await Promise.all(degreeData.courses.map(async (course) => {
       if (course.course_id === courseId) {
-        const newLesson = {
+        newLesson = {
           lesson_id: uuidv4(),
-          title: lessonData.title,
-          description: lessonData.description,
+          name: lessonData.name,
+          // description: lessonData.description,
           chapters: await Promise.all(lessonData.chapters.map(async (chapter) => {
             return {
               title: chapter.title,
@@ -193,6 +194,7 @@ export const addLessonToCourse = async (degreeId, courseId, lessonData) => {
             };
           })),
         };
+        console.log(newLesson)
 
         if (lessonData.test) {
           newLesson.test = createTestObject(lessonData.test); // Add test to new lesson
@@ -208,7 +210,7 @@ export const addLessonToCourse = async (degreeId, courseId, lessonData) => {
 
     await updateDoc(degreeRef, { courses: updatedCourses });
     console.log('Lesson successfully added to course!');
-    return true;
+    return newLesson;
   } catch (error) {
     console.error('Error adding lesson:', error);
     return false;
@@ -456,11 +458,11 @@ export const deleteTest = async (degreeId, courseId, lessonId, testId) => {
       if (course.course_id === courseId) {
         const updatedLessons = course.lessons.map((lesson) => {
           if (lesson.lesson_id === lessonId && lesson.test?.test_id === testId) {
-            lesson.test = null; 
+            lesson.test = null;
           }
           return lesson;
         });
-        
+
         if (course.finalTest?.test_id === testId) {
           course.finalTest = null;
         }

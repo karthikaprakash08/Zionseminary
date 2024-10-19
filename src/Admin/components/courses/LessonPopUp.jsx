@@ -9,6 +9,7 @@ import Upload from "../../assets/Images/upload.png";
 import { uploadFile } from '../../firebase/lessonApi';
 import LessonTest from './LessonTest';
 import { toast } from 'react-toastify';
+import { addLessonToCourse, deleteLesson, editLesson } from '../../firebase/degreeApi';
 
 
 const initialState = {
@@ -21,7 +22,7 @@ const initialState = {
 }
 
 
-const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }) => {
+const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId, courseId }) => {
   const [currentLesson, setCurrentLesson] = useState({
     name: null,
     chapters: [],
@@ -48,10 +49,10 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }
 
 
   const addSublessons = async () => {
-    if (!currentSublesson.duration || !currentSublesson.type || !currentSublesson.name) { 
+    if (!currentSublesson.duration || !currentSublesson.type || !currentSublesson.name) {
       toast.error('fill all details and add a test or file')
       return
-     };
+    };
 
     const newLessons = [...currentLesson.chapters];
 
@@ -67,10 +68,24 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }
 
 
 
-  const validateAndUpdateLesson = () => {
-    if (currentLesson.name && currentLesson.chapters.length > 0) {
+  const validateAndUpdateLesson = async () => {
+    if (currentLesson?.lesson_id) {
+      const res = await toast.promise(editLesson(degreeId, courseId, currentLesson?.lesson_id, currentLesson), {
+        pending: "updating lesson...",
+        success: "lesson updated successfully",
+        error: "An error occurred while updating lesson"
+      })
       addLesson(currentLesson);
-      cancel()
+      if (res) cancel()
+    } else if (currentLesson.name && degreeId && courseId) {
+      const res = await toast.promise(addLessonToCourse(degreeId, courseId, currentLesson), {
+        pending: "adding new lesson...",
+        success: "lesson added successfully",
+        error: "An error occurred while adding new lesson"
+      })
+      setCurrentLesson(res)
+      addLesson(currentLesson);
+      // if (res) cancel()
     } else {
       toast.error('Please add at least one subLesson and Lesson details')
     }
@@ -88,14 +103,15 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }
   };
 
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     const confirm = window.confirm(
       "Confirm to delete this lesson, all subLessons will be deleted"
     );
     console.log(editData?.title);
     if (confirm) {
-      removeThisLesson(editData?.updateIndex);
-      cancel();
+      const res = await deleteLesson(degreeId, courseId, currentLesson?.lesson_id)
+      if (res) removeThisLesson(editData?.updateIndex);
+      if (res) cancel();
     }
   };
 
@@ -133,7 +149,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }
               className="add-new-lesson-btn"
               onClick={() => validateAndUpdateLesson()}
             >
-              Add to Course
+              {currentLesson?.lesson_id ? "Update" : " Add to Course"}
             </div>
           </div>
         </div>
@@ -144,7 +160,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }
               type="text"
               name=""
               id=""
-              value={currentLesson.name}
+              value={currentLesson?.name}
               className="sublesson-title-input"
               onChange={(e) => setCurrentLesson({ ...currentLesson, name: e.target.value })}
             />
@@ -156,7 +172,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }
                 type="text"
                 name=""
                 id=""
-                value={currentSublesson.name}
+                value={currentSublesson?.name}
                 className="sublesson-title-input"
                 onChange={(e) => setCurrentSublesson({ ...currentSublesson, name: e.target.value })}
               />
@@ -169,17 +185,17 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }
                   name=""
                   id=""
                   className="sublesson-duration-input sublesson-title-input "
-                  value={currentSublesson.duration}
+                  value={currentSublesson?.duration}
                   onChange={(e) =>
                     handleSubLessonsInput("duration", e.target.value)
                   }
                 />
               </div>
               <div className="input-cnt add-sublesson-btn flex-input">
-                <div className="sublesson-title-input center-media" style={{ opacity: currentSublesson.testId && '0.5', pointerEvents: currentSublesson.testId && 'none' }}>
+                <div className="sublesson-title-input center-media" style={{ opacity: currentSublesson?.testId && '0.5', pointerEvents: currentSublesson?.testId && 'none' }}>
 
-                  {currentSublesson.link.length > 5 && !uploadingFile && (<p>{currentSublesson.type}</p>)}
-                  {currentSublesson.link.length < 5 && (<img src={!uploadingFile ? Upload : LoadingGif} alt="imag" className={`${!uploadingFile ? 'test-icon' : 'gif-icon'}`} />)}
+                  {currentSublesson?.link.length > 5 && !uploadingFile && (<p>{currentSublesson?.type}</p>)}
+                  {currentSublesson?.link.length < 5 && (<img src={!uploadingFile ? Upload : LoadingGif} alt="imag" className={`${!uploadingFile ? 'test-icon' : 'gif-icon'}`} />)}
                   <input
                     type="file"
                     name="video-upload"
@@ -190,7 +206,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId }
                     onChange={(e) => handleAddFile(e.target.files[0])}
                   />
                 </div>
-                <div className="sublesson-title-input center-media" style={{ cursor: 'pointer', opacity: currentSublesson.type && '0.5', pointerEvents: currentSublesson?.type && 'none', }} onClick={() => setOpenLessonTest(true)}>
+                <div className="sublesson-title-input center-media" style={{ cursor: 'pointer', opacity: currentSublesson?.type && '0.5', pointerEvents: currentSublesson?.type && 'none', }} onClick={() => setOpenLessonTest(true)}>
                   <img src={Test} alt="imag" className='test-icon' />
                 </div>
               </div>

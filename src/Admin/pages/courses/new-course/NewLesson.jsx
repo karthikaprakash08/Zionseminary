@@ -11,7 +11,7 @@ import BackIcon from "../../../assets/Images/left-arrow.png";
 import AddTest from "./AddTest";
 import LessonPopUp from "../../../components/courses/LessonPopUp";
 import { toast } from "react-toastify";
-import { addCourseToDegree } from "../../../firebase/degreeApi";
+import { addCourseToDegree, editCourse } from "../../../firebase/degreeApi";
 
 
 const initialState = {
@@ -56,11 +56,23 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse, degreeId }) 
 
   const validateAndUpdateCourse = async () => {
     if (currentCourse.description.length > 5 && currentCourse.name) {
-      // addCourse(currentCourse)
-      if (degreeId) {
-        console.log(degreeId)
-        let res = await addCourseToDegree(degreeId, currentCourse)
-        console.log("Course updated", res)
+      if (degreeId && !currentCourse?.course_id) {
+
+        let res = await toast.promise( addCourseToDegree(degreeId, currentCourse),{
+          pending: "adding course...",
+          success: "course added successfully",
+          error: "An error occurred while adding new course"
+        })
+        setCurrentCourse(res)
+        if (res) addCourse(currentCourse)
+
+      } else if (currentCourse?.course_id) {
+        let res = await toast.promise(editCourse(degreeId, currentCourse?.course_id, currentCourse),{
+          pending: "updating course...",
+          success: "course updated successfully",
+          error: "An error occurred while updating course"
+        })
+        if (res) addCourse(currentCourse)
       }
       // cancel()
     } else {
@@ -102,6 +114,7 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse, degreeId }) 
               removeThisLesson={(lessonIndex) => handleRemoveLessonFromCourse(lessonIndex)}
               cancel={() => setOPenLessonPopUP({ open: false, data: null })}
               degreeId={degreeId}
+              courseId={currentCourse?.course_id}
             />
           )
         }
@@ -131,7 +144,7 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse, degreeId }) 
               className="add-new-lesson-btn"
               onClick={() => validateAndUpdateCourse()}
             >
-              Add to Degree
+              {currentCourse.course_id ? "Update Course" : "Add to Degree"}
             </div>
           </div>
         </div>

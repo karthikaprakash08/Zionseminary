@@ -220,7 +220,7 @@ const Edit = ({ courseDetails }) => {
               name=""
               id=""
               className="name-input"
-              value={courseData.name}
+              value={courseData?.name}
               readOnly={editCourse ? false : true}
               onChange={(e) => handledirectInput("name", e.target.value)}
             />
@@ -233,7 +233,7 @@ const Edit = ({ courseDetails }) => {
                 name=""
                 id=""
                 readOnly={editCourse ? false : true}
-                value={courseData.price !== null ? courseData.price : ""}
+                value={courseData?.price !== null ? courseData?.price : ""}
                 className="name-input price-input"
                 placeholder="₹"
                 onChange={(e) => handledirectInput("price", e.target.value)}
@@ -266,7 +266,7 @@ const Edit = ({ courseDetails }) => {
             )}
           </div>
           <div className="lesson-list-cnt">
-            {courseData.courses?.length > 0 ? (
+            {courseData?.courses?.length > 0 ? (
               courseData?.courses?.map((lesson, index) => (
                 <div
                   className="lesson"
