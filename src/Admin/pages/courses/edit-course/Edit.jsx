@@ -307,7 +307,7 @@ const Edit = ({ courseDetails }) => {
           editData={popupOpen?.data}
           cancel={() => setPopupOpen({ open: false, data: null })}
           removeThisCourse={(index) => handleDeleteCourse(index)}
-          degreeId={courseData.degreeId}
+          degreeId={courseData.id}
         />
       )}
     </div>

@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc, getDoc, Firestore } from 'firebase/firestore';
 import { db, storage } from './firebase'; 
 import { uploadToVimeo } from './externalServices'; 
 import { v4 as uuidv4 } from 'uuid';
@@ -88,6 +88,7 @@ export const deleteDegree = async (degreeId) => {
 
 // Add Course under a Degree
 export const addCourseToDegree = async (degreeId, courseData) => {
+  console.log('Adding Course under')
   try {
     const degreeRef = doc(db, 'degrees', degreeId);
     const newCourse = {
@@ -96,10 +97,10 @@ export const addCourseToDegree = async (degreeId, courseData) => {
       description: courseData.description,
       createdAt: Date.now(),
     };
-
     await updateDoc(degreeRef, {
       courses: firebase.firestore.FieldValue.arrayUnion(newCourse),
     });
+    console.log('Adding Course ...',newCourse)
 
     console.log('Course successfully added to degree!');
     return newCourse.courseId;

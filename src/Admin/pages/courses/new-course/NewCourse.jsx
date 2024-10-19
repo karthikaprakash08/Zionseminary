@@ -59,7 +59,7 @@ const NewCourse = () => {
     if (
       courseData.name &&
       // courseData.description &&
-      courseData.courses.length > 0 &&
+      // courseData.courses.length > 0 &&
       courseData.price
     ) {
       // const courseFormData = convertToCourseFormData(courseData)

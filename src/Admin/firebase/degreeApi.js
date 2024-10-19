@@ -1,5 +1,5 @@
 import { db, storage } from './firebase';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, getDoc } from 'firebase/firestore';
 import { uploadToVimeo } from './externalServices';
 import { v4 as uuidv4 } from 'uuid';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
@@ -134,6 +134,42 @@ export const deleteDegree = async (degreeId) => {
     return false;
   }
 };
+
+// add course to degree
+export const addCourseToDegree = async (degreeId, courseData) => {
+  try {
+    const degreeRef = doc(db, 'degrees', degreeId);
+    const degreeSnapshot = await getDoc(degreeRef);
+    const degreeData = degreeSnapshot.data();
+
+    console.log(degreeData)
+    if (!degreeSnapshot.exists()) {
+      console.error('No such degree found with id:', degreeId);
+      return false;
+    }
+
+
+    const newCourse = {
+      course_id: uuidv4(),
+      name: courseData.name,
+      description: courseData.description,
+      image: courseData.image || '',
+      chapters: [], // Placeholder for chapters
+      finalTest: courseData.finalTest ? createTestObject(courseData.finalTest) : null, // Final test for the course
+    };
+
+    const updatedCourses = [...degreeData?.courses, newCourse]; // Add the new course
+    console.log("Updated",updatedCourses)
+
+    await updateDoc(degreeRef, { courses: updatedCourses });
+    console.log('Course successfully added to degree!');
+    return true;
+  } catch (error) {
+    console.error('Error adding course:', error);
+    return false;
+  }
+};
+
 
 // Add Lesson to a Course
 export const addLessonToCourse = async (degreeId, courseId, lessonData) => {

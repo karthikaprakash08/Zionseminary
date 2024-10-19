@@ -10,8 +10,8 @@ import ArrowRight from "../../../assets/Images/arrow-right.png";
 import BackIcon from "../../../assets/Images/left-arrow.png";
 import AddTest from "./AddTest";
 import LessonPopUp from "../../../components/courses/LessonPopUp";
-import { addCourseToDegree } from "../../../firebase/lessonApi";
 import { toast } from "react-toastify";
+import { addCourseToDegree } from "../../../firebase/degreeApi";
 
 
 const initialState = {
@@ -54,12 +54,16 @@ const NewLesson = ({ addCourse, cancel, editData, removeThisCourse, degreeId }) 
     return Doc
   }
 
-  const validateAndUpdateCourse = () => {
-    if (currentCourse.description.length > 5 && currentCourse.name && currentCourse.lessons.length > 0) {
-      addCourse(currentCourse)
-      if (degreeId) addCourseToDegree(degreeId, currentCourse)
-      cancel()
-    }else{
+  const validateAndUpdateCourse = async () => {
+    if (currentCourse.description.length > 5 && currentCourse.name) {
+      // addCourse(currentCourse)
+      if (degreeId) {
+        console.log(degreeId)
+        let res = await addCourseToDegree(degreeId, currentCourse)
+        console.log("Course updated", res)
+      }
+      // cancel()
+    } else {
       toast.error('Please add at least one Lesson and course details')
     }
   }
