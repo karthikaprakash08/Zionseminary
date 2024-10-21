@@ -96,7 +96,7 @@ const Edit = ({ courseDetails }) => {
       try {
         console.log(courseDetails)
         const res = await toast.promise(
-          editDegree(courseDetails.id, courseData), 
+          editDegree(courseDetails.id, courseData),
           {
             pending: "Updating course...",
             success: "Course updated successfully",

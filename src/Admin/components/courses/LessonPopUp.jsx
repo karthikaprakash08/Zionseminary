@@ -66,8 +66,6 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId, 
     setCurrentUpdateIndex(null);
   };
 
-
-
   const validateAndUpdateLesson = async () => {
     if (currentLesson?.lesson_id) {
       const res = await toast.promise(editLesson(degreeId, courseId, currentLesson?.lesson_id, currentLesson), {
@@ -84,7 +82,7 @@ const LessonPopUp = ({ addLesson, cancel, editData, removeThisLesson, degreeId, 
         error: "An error occurred while adding new lesson"
       })
       setCurrentLesson(res)
-      addLesson(currentLesson);
+      addLesson(res);
       // if (res) cancel()
     } else {
       toast.error('Please add at least one subLesson and Lesson details')
